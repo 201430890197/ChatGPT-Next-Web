@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>混凝土车辆调度看板 · 原型</title>
+<style>
+  :root{
+    --bg:#0f1521; --panel:#16203058; --panel2:#1b2738; --line:#26344a;
+    --txt:#e6edf6; --sub:#8aa0bd; --accent:#3aa0ff; --green:#2ecc71;
+    --yellow:#f1c40f; --orange:#e67e22; --red:#e74c3c; --purple:#9b59b6;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--txt);
+    font-family:-apple-system,"PingFang SC","Microsoft YaHei",Segoe UI,Roboto,sans-serif;}
+  body{display:flex;flex-direction:column;overflow:hidden}
+  header{display:flex;align-items:center;gap:18px;padding:10px 18px;
+    background:linear-gradient(90deg,#16213a,#0f1521);border-bottom:1px solid var(--line)}
+  header h1{font-size:17px;margin:0;font-weight:600;letter-spacing:.5px}
+  header .tag{font-size:11px;color:var(--sub);border:1px solid var(--line);
+    padding:2px 7px;border-radius:10px}
+  .clock{font-variant-numeric:tabular-nums;font-size:15px;color:var(--accent);font-weight:600}
+  .ctrls{margin-left:auto;display:flex;align-items:center;gap:8px}
+  button{background:var(--panel2);color:var(--txt);border:1px solid var(--line);
+    border-radius:7px;padding:6px 11px;font-size:13px;cursor:pointer;transition:.15s}
+  button:hover{border-color:var(--accent);color:#fff}
+  button.primary{background:var(--accent);border-color:var(--accent);color:#04203f;font-weight:600}
+  button.warn{background:#3a2118;border-color:var(--orange);color:#ffb97a}
+  .speed{display:flex;gap:4px}
+  .speed button.on{background:var(--accent);color:#04203f;border-color:var(--accent)}
+  main{flex:1;display:grid;grid-template-columns:330px 1fr 360px;gap:10px;padding:10px;overflow:hidden}
+  .col{display:flex;flex-direction:column;gap:10px;overflow:hidden}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px;
+    backdrop-filter:blur(2px)}
+  .card h2{font-size:13px;margin:0 0 10px;color:var(--sub);font-weight:600;
+    display:flex;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:.6px}
+  .scroll{overflow-y:auto;padding-right:4px}
+  .scroll::-webkit-scrollbar{width:7px}
+  .scroll::-webkit-scrollbar-thumb{background:#2a3a52;border-radius:4px}
+
+  /* KPI */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .kpi{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 6px;text-align:center}
+  .kpi .v{font-size:19px;font-weight:700;font-variant-numeric:tabular-nums}
+  .kpi .l{font-size:10px;color:var(--sub);margin-top:2px}
+
+  /* Sites */
+  .site{background:var(--panel2);border:1px solid var(--line);border-left:4px solid var(--green);
+    border-radius:8px;padding:10px;margin-bottom:10px}
+  .site .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+  .site .nm{font-weight:600;font-size:14px}
+  .badge{font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600}
+  .b-ok{background:#16341f;color:var(--green)}
+  .b-warn{background:#3a3413;color:var(--yellow)}
+  .b-cut{background:#3a1714;color:var(--red)}
+  .b-jam{background:#2a1a3a;color:#c89bff}
+  .b-done{background:#1b2738;color:var(--sub)}
+  .meta{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:11px;color:var(--sub);margin-bottom:7px}
+  .meta b{color:var(--txt);font-weight:600}
+  .bar{height:7px;background:#0e1622;border-radius:4px;overflow:hidden}
+  .bar i{display:block;height:100%;background:linear-gradient(90deg,#2aa0ff,#2ecc71)}
+  .site .stat{display:flex;gap:6px;margin-top:8px;font-size:11px}
+  .pill{background:#0e1622;border:1px solid var(--line);border-radius:6px;padding:3px 7px;color:var(--sub)}
+  .pill b{color:var(--txt)}
+  .countdown{font-weight:700}
+
+  /* Map */
+  #mapwrap{flex:1;position:relative;min-height:0}
+  canvas{width:100%;height:100%;display:block;border-radius:8px;background:
+    radial-gradient(circle at 30% 20%,#16243d,#0d1320)}
+  .legend{position:absolute;bottom:10px;left:12px;display:flex;gap:14px;font-size:11px;color:var(--sub)}
+  .legend span{display:flex;align-items:center;gap:5px}
+  .dot{width:9px;height:9px;border-radius:50%}
+
+  /* Suggestions */
+  .sug{background:var(--panel2);border:1px solid var(--line);border-left:4px solid var(--accent);
+    border-radius:8px;padding:9px 10px;margin-bottom:8px;font-size:13px}
+  .sug.urgent{border-left-color:var(--red);background:#241419}
+  .sug.ext{border-left-color:var(--purple);background:#1f1730}
+  .sug .h{font-weight:600;margin-bottom:3px}
+  .sug .r{font-size:11px;color:var(--sub);line-height:1.5}
+  .sug .act{margin-top:7px;display:flex;gap:6px}
+  .sug button{padding:4px 10px;font-size:12px}
+  .empty{color:var(--sub);font-size:12px;text-align:center;padding:14px}
+
+  /* Trucks */
+  .truck{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:7px;
+    background:var(--panel2);border:1px solid var(--line);margin-bottom:6px;font-size:12px}
+  .truck .ic{width:26px;height:26px;border-radius:6px;display:grid;place-items:center;font-size:13px;flex-shrink:0}
+  .truck .nm{font-weight:600;font-size:12px}
+  .truck .ds{font-size:10px;color:var(--sub)}
+  .truck .rt{margin-left:auto;text-align:right;font-size:10px;color:var(--sub)}
+  .truck .rt b{display:block;font-size:11px;color:var(--txt);font-variant-numeric:tabular-nums}
+  .s-idle{color:var(--sub)} .s-load{color:var(--yellow)} .s-go{color:var(--accent)}
+  .s-unload{color:var(--green)} .s-back{color:#7fb8ff} .s-park{color:#586a85} .s-ext{color:#c89bff}
+  .toolbar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+  .toolbar input,.toolbar select{background:var(--panel2);border:1px solid var(--line);color:var(--txt);
+    border-radius:6px;padding:5px 7px;font-size:12px}
+  label.sw{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--sub);cursor:pointer}
+  .hint{font-size:11px;color:var(--sub);line-height:1.5}
+</style>
+</head>
+<body>
+<header>
+  <h1>🚛 混凝土车辆调度看板</h1>
+  <span class="tag">原型 Demo · 模拟数据</span>
+  <span class="clock" id="clock">08:00</span>
+  <span class="tag" id="daytag">第 1 班 · 已运行 0 分钟</span>
+  <div class="ctrls">
+    <label class="sw"><input type="checkbox" id="autoMode" checked /> 自动调度</label>
+    <div class="speed" id="speed">
+      <button data-s="0">⏸</button>
+      <button data-s="1" class="on">1×</button>
+      <button data-s="4">4×</button>
+      <button data-s="16">16×</button>
+    </div>
+    <button id="resetBtn">重置</button>
+  </div>
+</header>
+
+<main>
+  <!-- 左:工地 -->
+  <div class="col">
+    <div class="card">
+      <h2>📊 运营总览</h2>
+      <div class="kpis">
+        <div class="kpi"><div class="v" id="kAvail">0</div><div class="l">可调度运力</div></div>
+        <div class="kpi"><div class="v" id="kRun">0</div><div class="l">在途车辆</div></div>
+        <div class="kpi"><div class="v" id="kExt">0</div><div class="l">外调车</div></div>
+        <div class="kpi"><div class="v" id="kWaste">0</div><div class="l">报废(方)</div></div>
+      </div>
+    </div>
+    <div class="card" style="flex:1;display:flex;flex-direction:column;min-height:0">
+      <h2>🏗 工地供应状态 <button id="addSite" style="margin-left:auto;padding:3px 8px;font-size:11px">+工地</button></h2>
+      <div class="scroll" id="sites" style="flex:1"></div>
+    </div>
+  </div>
+
+  <!-- 中:地图 -->
+  <div class="col">
+    <div class="card" style="flex:1;display:flex;flex-direction:column;min-height:0">
+      <h2>🗺 实时态势(搅拌站 ↔ 工地)</h2>
+      <div id="mapwrap">
+        <canvas id="map"></canvas>
+        <div class="legend">
+          <span><i class="dot" style="background:#3aa0ff"></i>重车去程</span>
+          <span><i class="dot" style="background:#7fb8ff"></i>空车返程</span>
+          <span><i class="dot" style="background:#2ecc71"></i>卸料中</span>
+          <span><i class="dot" style="background:#f1c40f"></i>装料中</span>
+          <span><i class="dot" style="background:#c89bff"></i>外调车</span>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>🧮 调度算法依据 <span class="tag" style="margin-left:auto">按工地需求实时测算</span></h2>
+      <div class="hint" id="formula"></div>
+    </div>
+  </div>
+
+  <!-- 右:建议 + 车队 -->
+  <div class="col">
+    <div class="card">
+      <h2>💡 派车建议 <span class="tag" id="sugCount" style="margin-left:auto">0</span></h2>
+      <div class="scroll" id="sugs" style="max-height:30vh"></div>
+    </div>
+    <div class="card" style="flex:1;display:flex;flex-direction:column;min-height:0">
+      <h2>🚚 车队状态(14车 / 9司机)</h2>
+      <div class="toolbar">
+        <label class="sw"><input type="checkbox" id="fltActive" /> 只看在途</label>
+        <span class="hint" id="driverInfo" style="margin-left:auto"></span>
+      </div>
+      <div class="scroll" id="trucks" style="flex:1"></div>
+    </div>
+  </div>
+</main>
+
+<script>
+"use strict";
+/* =========================================================================
+   混凝土调度仿真原型
+   核心约束:
+   - 混凝土出罐后须在【初凝时间】内浇筑完,否则报废
+   - 工地按【浇筑速度 m³/h】连续消耗,断供即"断料",车排队即"压车"
+   - 14 台车但仅 9 名司机 => 同时最多 9 台自有车在跑,超出需"外调"
+   ========================================================================= */
+
+const CFG = {
+  truckCap: 8,        // 单车容量 m³(按8方搅拌车)
+  loadTime: 6,        // 装料耗时 min
+  setTime: 120,       // 初凝时间 min(出罐->浇筑完成上限)
+  speedKmh: 36,       // 平均车速 km/h
+  drivers: 9,         // 自有司机数 => 自有运力上限
+  trucksOwn: 14,      // 自有车数
+  startMin: 8*60,     // 08:00 开班
+};
+
+// ---- 实体 ----
+const PLANT = {x:0.5, y:0.5, name:"搅拌站"};
+let sites = [];
+let trucks = [];
+let simMin = CFG.startMin;
+let speed = 1;
+let wasteVol = 0;   // 累计报废方量
+let extSeq = 0;
+let siteSeq = 0;
+
+const driverNames = ["张师傅","李师傅","王师傅","赵师傅","刘师傅","陈师傅","杨师傅","黄师傅","周师傅"];
+
+function fmtClock(m){const h=Math.floor(m/60)%24,mm=Math.floor(m%60);
+  return String(h).padStart(2,"0")+":"+String(mm).padStart(2,"0");}
+
+// 工地预设:不同距离、不同浇筑速度
+function defaultSites(){
+  return [
+    mkSite("万达广场 3# 楼", 0.16, 0.20, 30, 480),  // 距站约? 高需求
+    mkSite("滨江路桥墩",     0.85, 0.30, 18, 240),
+    mkSite("恒大学府住宅",   0.30, 0.86, 24, 360),
+  ];
+}
+function mkSite(name,x,y,pourRate,total){
+  siteSeq++;
+  const dxk = Math.hypot(x-PLANT.x,y-PLANT.y)*22; // 把画布距离映射成 ~公里
+  return {
+    id:"S"+siteSeq, name, x, y,
+    distKm: +dxk.toFixed(1),
+    pourRate,                 // m³/h 浇筑速度
+    total,                    // 总方量
+    poured:0,                 // 已浇方量
+    onsite:[],                // 现场车队(车id),第0台正在卸
+    cutMin:0,                 // 累计断料分钟
+    lastDispatch:CFG.startMin-9999, // 上次为该工地发车的时刻
+    active:true,
+  };
+}
+function travelMin(s){ return Math.max(3, (s.distKm/CFG.speedKmh)*60); }
+// 单车在现场卸料/泵送时长:容量 / 浇筑速度
+function unloadMin(s){ return (CFG.truckCap/s.pourRate)*60; }
+// 供应间隔:每隔多久应有一台车到场,才能匹配浇筑速度连续供应
+function supplyInterval(s){ return (CFG.truckCap/s.pourRate)*60; }
+// 一个完整循环耗时(min)
+function cycleMin(s){ return CFG.loadTime + travelMin(s) + unloadMin(s) + travelMin(s); }
+// 维持该工地连续浇筑所需车数
+function needTrucks(s){ return Math.ceil(s.pourRate * (cycleMin(s)/60) / CFG.truckCap); }
+
+function initTrucks(){
+  trucks = [];
+  for(let i=0;i<CFG.trucksOwn;i++){
+    const hasDriver = i < CFG.drivers;
+    trucks.push({
+      id:"T"+(i+1),
+      plate:"鲁A·"+String(8000+i*111%9000).padStart(4,"0"),
+      driver: hasDriver ? driverNames[i] : null,
+      onDuty: hasDriver,        // 是否在岗(有司机)
+      ext:false,
+      state: hasDriver ? "idle" : "park",  // idle/load/go/unload/back/park
+      site:null, timer:0, loadMin:0, prog:0, x:PLANT.x, y:PLANT.y,
+    });
+  }
+}
+
+// ============================ 调度核心 ============================
+// 计算工地"断料倒计时":现有现场+在途供应能维持多久
+function suppliedMinutes(s){
+  // 现场:第0台正在卸,剩余可浇时间 + 排队车提供的量
+  let supply = 0;
+  s.onsite.forEach((tid,idx)=>{
+    const t = byId(tid);
+    if(idx===0){ supply += (CFG.truckCap - t.prog); } // prog=已卸方量
+    else supply += CFG.truckCap;
+  });
+  // 在途重车(go)按 ETA 排序,只要 ETA < 当前供应耗尽时间即可续上
+  const incoming = trucks.filter(t=>t.state==="go"&&t.site===s.id)
+                         .map(t=>t.timer).sort((a,b)=>a-b);
+  let runout = supply / s.pourRate * 60; // 现场可维持分钟
+  for(const eta of incoming){
+    if(eta <= runout + 0.1){ runout += CFG.truckCap/s.pourRate*60; }
+    else break; // 出现缺口
+  }
+  return runout;
+}
+// 该工地已分配车数(在途+现场+正为其装料)
+function assignedTrucks(s){
+  return trucks.filter(t=>t.site===s.id &&
+    (t.state==="go"||t.state==="unload"||t.state==="load")).length;
+}
+function ownActive(){ return trucks.filter(t=>!t.ext&&t.onDuty&&t.state!=="idle"&&t.state!=="park").length; }
+function idleOwn(){ return trucks.filter(t=>!t.ext&&t.onDuty&&t.state==="idle"); }
+function byId(id){ return trucks.find(t=>t.id===id); }
+
+// 生成派车建议(并在自动模式下执行)
+function computeSuggestions(){
+  const sug = [];
+  const live = sites.filter(s=>s.active && s.poured < s.total);
+  // 为每个工地算紧迫度
+  const ranked = live.map(s=>{
+    const need = needTrucks(s);
+    const have = assignedTrucks(s);
+    const runout = suppliedMinutes(s);
+    const sinceLast = simMin - s.lastDispatch;
+    return {s, need, have, deficit: need-have, runout, sinceLast};
+  }).sort((a,b)=> a.runout - b.runout); // 越快断料越紧急
+
+  const idle = idleOwn();
+  let idleN = idle.length;
+
+  for(const r of ranked){
+    if(r.deficit <= 0) continue;          // 已够,再派会压车 -> 跳过
+    // 错峰发车:距上次发车未达供应间隔,且供应还撑得住 => 暂不发,避免扎堆压车
+    const urgent = r.runout < travelMin(r.s)+CFG.loadTime; // 来不及了
+    if(!urgent && r.sinceLast < supplyInterval(r.s)*0.85) continue;
+    if(idleN > 0){
+      sug.push({
+        type: urgent?"urgent":"normal",
+        siteId: r.s.id,
+        title:`派 1 台 → ${r.s.name}`,
+        reason:`该工地需 ${r.need} 台保连续浇筑,当前仅 ${r.have} 台在保供;`+
+               `现有供应约 ${Math.round(r.runout)} 分钟后耗尽`+
+               (urgent?`,已逼近断料,需立即装料发车!`:`。`),
+        action:"dispatch"
+      });
+      idleN--;
+    } else if(ownActive() >= CFG.drivers){
+      // 自有运力(9司机)已打满 -> 外调
+      sug.push({
+        type:"ext", siteId:r.s.id,
+        title:`外调 1 台 → ${r.s.name}`,
+        reason:`9 名司机已全部在岗满负荷,自有运力不足以覆盖 ${r.s.name} 的缺口`+
+               `(尚缺 ${r.deficit} 台)。建议外调车+外调司机顶上,否则约 `+
+               `${Math.round(r.runout)} 分钟后断料。`,
+        action:"external"
+      });
+    }
+  }
+  return sug;
+}
+
+function dispatchToSite(siteId){
+  const s = sites.find(x=>x.id===siteId); if(!s) return false;
+  const t = idleOwn()[0]; if(!t) return false;
+  startLoading(t,s); return true;
+}
+function externalToSite(siteId){
+  const s = sites.find(x=>x.id===siteId); if(!s) return false;
+  extSeq++;
+  const t = {id:"E"+extSeq, plate:"外调·"+String(extSeq).padStart(2,"0"),
+    driver:"外调司机", onDuty:true, ext:true, state:"idle", site:null,
+    timer:0, loadMin:0, prog:0, x:PLANT.x, y:PLANT.y};
+  trucks.push(t);
+  startLoading(t,s); return true;
+}
+function startLoading(t,s){
+  t.site=s.id; t.state="load"; t.timer=CFG.loadTime;
+  t.loadMin=simMin; t.prog=0; t.x=PLANT.x; t.y=PLANT.y;
+  s.lastDispatch=simMin;
+}
+
+// ============================ 仿真步进 ============================
+function step(dtMin){
+  simMin += dtMin;
+  // 1) 工地消耗 + 现场卸料
+  for(const s of sites){
+    if(!s.active || s.poured>=s.total){ continue; }
+    if(s.onsite.length>0){
+      const t = byId(s.onsite[0]);
+      const pour = Math.min(s.pourRate/60*dtMin, CFG.truckCap - t.prog, s.total - s.poured);
+      t.prog += pour; s.poured += pour;
+      if(t.prog >= CFG.truckCap - 1e-6){
+        // 卸完,出场返程
+        s.onsite.shift();
+        t.state="back"; t.timer=travelMin(s); t.prog=0;
+      }
+    } else {
+      // 无车卸料 = 断料
+      if(s.poured < s.total) s.cutMin += dtMin;
+    }
+  }
+  // 2) 车辆状态推进
+  for(const t of trucks){
+    if(t.state==="idle"||t.state==="park"||t.state==="unload") continue;
+    t.timer -= dtMin;
+    const s = sites.find(x=>x.id===t.site);
+    if(t.state==="load" && t.timer<=0){
+      // 装料完成 -> 重车去程
+      t.state="go"; t.timer = s?travelMin(s):10;
+    } else if(t.state==="go" && t.timer<=0){
+      // 到达工地
+      if(!s){ t.state="back"; t.timer=8; continue; }
+      // 初凝超时检查:出罐到现在
+      const aged = simMin - t.loadMin;
+      // 进入现场:若前面有车 => 压车排队;真正开浇时再判断超时
+      s.onsite.push(t.id);
+      t.state="unload";
+      // 若现场已有车在卸,本车排队(压车)——其超时风险更高
+    } else if(t.state==="back" && t.timer<=0){
+      // 返回搅拌站
+      if(t.ext){ // 外调车完成一单后离场(简化:回到空闲可再被外调复用)
+        t.state="idle"; t.site=null;
+      } else {
+        t.state="idle"; t.site=null;
+      }
+    }
+    // 超时报废检查:车在现场排队/卸料过久
+    if(t.state==="unload"){
+      const aged = simMin - t.loadMin;
+      const queued = s && s.onsite[0]!==t.id; // 排队未开浇
+      if(aged > CFG.setTime){
+        // 这车的剩余料报废
+        wasteVol += (CFG.truckCap - t.prog);
+        if(s){ const i=s.onsite.indexOf(t.id); if(i>=0)s.onsite.splice(i,1); }
+        t.state="back"; t.timer = s?travelMin(s):8; t.prog=0;
+      }
+    }
+  }
+  // 3) 位置插值(给地图用)
+  for(const t of trucks) updatePos(t);
+  // 4) 自动调度
+  if(document.getElementById("autoMode").checked){
+    const sug = computeSuggestions();
+    for(const g of sug){
+      if(g.action==="dispatch") dispatchToSite(g.siteId);
+      // 外调不自动执行(花钱),仅给建议,需人工点
+    }
+  }
+}
+function updatePos(t){
+  const s = sites.find(x=>x.id===t.site);
+  if(t.state==="load"||t.state==="idle"||t.state==="park"){ t.x=PLANT.x;t.y=PLANT.y;return; }
+  if(!s) return;
+  if(t.state==="go"){
+    const frac = 1 - t.timer/Math.max(travelMin(s),0.1);
+    t.x = PLANT.x+(s.x-PLANT.x)*frac; t.y=PLANT.y+(s.y-PLANT.y)*frac;
+  } else if(t.state==="unload"){ t.x=s.x; t.y=s.y; }
+  else if(t.state==="back"){
+    const frac = 1 - t.timer/Math.max(travelMin(s),0.1);
+    t.x = s.x+(PLANT.x-s.x)*frac; t.y=s.y+(PLANT.y-s.y)*frac;
+  }
+}
+
+// ============================ 渲染 ============================
+function siteStatus(s){
+  if(s.poured>=s.total) return {k:"done",txt:"已完成"};
+  const jam = s.onsite.length>=3;
+  const runout = suppliedMinutes(s);
+  if(s.onsite.length===0 && runout<1) return {k:"cut",txt:"⛔ 断料中"};
+  if(jam) return {k:"jam",txt:"⚠ 压车 "+s.onsite.length+"台"};
+  if(runout < travelMin(s)+CFG.loadTime) return {k:"warn",txt:"⏳ 即将断料"};
+  return {k:"ok",txt:"✓ 供应正常"};
+}
+function renderSites(){
+  const box=document.getElementById("sites"); box.innerHTML="";
+  for(const s of sites){
+    const st=siteStatus(s);
+    const need=needTrucks(s), have=assignedTrucks(s);
+    const runout=suppliedMinutes(s);
+    const pct=Math.min(100,s.poured/s.total*100);
+    const borderC={ok:"#2ecc71",warn:"#f1c40f",cut:"#e74c3c",jam:"#9b59b6",done:"#586a85"}[st.k];
+    const div=document.createElement("div");
+    div.className="site"; div.style.borderLeftColor=borderC;
+    div.innerHTML=`
+      <div class="top"><span class="nm">${s.name}</span>
+        <span class="badge b-${st.k}">${st.txt}</span></div>
+      <div class="meta">
+        <span>浇筑速度 <b>${s.pourRate} m³/h</b></span>
+        <span>距站 <b>${s.distKm} km</b></span>
+        <span>循环 <b>${Math.round(cycleMin(s))} min</b></span>
+      </div>
+      <div class="bar"><i style="width:${pct}%"></i></div>
+      <div class="meta" style="margin-top:5px">
+        <span>已浇 <b>${Math.round(s.poured)}</b>/${s.total} m³</span>
+        <span>累计断料 <b style="color:${s.cutMin>5?'#e74c3c':'#8aa0bd'}">${Math.round(s.cutMin)} min</b></span>
+      </div>
+      <div class="stat">
+        <span class="pill">需车 <b>${need}</b></span>
+        <span class="pill">在保供 <b style="color:${have<need?'#f1c40f':'#2ecc71'}">${have}</b></span>
+        <span class="pill">现场 <b>${s.onsite.length}</b></span>
+        <span class="pill countdown" style="color:${runout<10?'#e74c3c':'#8aa0bd'}">
+          ${s.poured>=s.total?'—':'断料倒计时 '+Math.round(runout)+'m'}</span>
+      </div>`;
+    box.appendChild(div);
+  }
+}
+const stMap={idle:["待命","s-idle","🅿"],load:["装料中","s-load","⛽"],
+  go:["重车去程","s-go","🚛"],unload:["卸料中","s-unload","🏗"],
+  back:["空车返程","s-back","↩"],park:["停场(无司机)","s-park","🅿"]};
+function renderTrucks(){
+  const box=document.getElementById("trucks"); box.innerHTML="";
+  const onlyActive=document.getElementById("fltActive").checked;
+  for(const t of trucks){
+    if(onlyActive && (t.state==="idle"||t.state==="park")) continue;
+    const [label,cls,ic]=stMap[t.state]||["?","s-idle","?"];
+    const s=sites.find(x=>x.id===t.site);
+    let right="";
+    if(t.state==="go"||t.state==="back"||t.state==="load")
+      right=`<b>${Math.max(0,Math.round(t.timer))}m</b>${s?s.name.slice(0,6):''}`;
+    else if(t.state==="unload") right=`<b>卸 ${Math.round(t.prog)}/${CFG.truckCap}</b>${s?s.name.slice(0,6):''}`;
+    else if(t.state==="park") right=`<b>备用</b>`;
+    else right=`<b>空闲</b>`;
+    const bg={idle:"#1b2738",load:"#3a3413",go:"#13283a",unload:"#16341f",
+      back:"#16243a",park:"#1b2230"}[t.state];
+    const div=document.createElement("div");
+    div.className="truck";
+    div.innerHTML=`<div class="ic" style="background:${bg}">${ic}</div>
+      <div><div class="nm">${t.plate}${t.ext?' <span class="s-ext">外</span>':''}</div>
+      <div class="ds">${t.driver||'无司机'} · <span class="${cls}">${label}</span></div></div>
+      <div class="rt">${right}</div>`;
+    box.appendChild(div);
+  }
+  const active=ownActive();
+  document.getElementById("driverInfo").innerHTML=
+    `在岗司机 ${active}/${CFG.drivers} ${active>=CFG.drivers?'<b style="color:#e67e22">已满负荷</b>':''}`;
+}
+function renderSuggestions(){
+  const box=document.getElementById("sugs");
+  const sug=computeSuggestions();
+  document.getElementById("sugCount").textContent=sug.length;
+  if(sug.length===0){ box.innerHTML='<div class="empty">✓ 当前供应均衡,无需额外派车</div>'; return; }
+  box.innerHTML="";
+  for(const g of sug){
+    const div=document.createElement("div");
+    div.className="sug "+(g.type==="urgent"?"urgent":g.type==="ext"?"ext":"");
+    div.innerHTML=`<div class="h">${g.type==="ext"?'🔶 ':g.type==="urgent"?'🔴 ':'🔵 '}${g.title}</div>
+      <div class="r">${g.reason}</div>
+      <div class="act">
+        <button class="primary" data-go="${g.action}" data-s="${g.siteId}">
+          ${g.action==="external"?'确认外调':'立即派车'}</button>
+      </div>`;
+    box.appendChild(div);
+  }
+  box.querySelectorAll("button[data-go]").forEach(b=>{
+    b.onclick=()=>{ b.dataset.go==="external"?externalToSite(b.dataset.s):dispatchToSite(b.dataset.s);
+      renderAll(); };
+  });
+}
+function renderKPI(){
+  document.getElementById("kAvail").textContent=idleOwn().length;
+  document.getElementById("kRun").textContent=trucks.filter(t=>t.state==="go"||t.state==="unload"||t.state==="back").length;
+  document.getElementById("kExt").textContent=trucks.filter(t=>t.ext).length;
+  document.getElementById("kWaste").textContent=Math.round(wasteVol);
+  document.getElementById("clock").textContent=fmtClock(simMin);
+  document.getElementById("daytag").textContent=`第 1 班 · 已运行 ${Math.round(simMin-CFG.startMin)} 分钟`;
+}
+function renderFormula(){
+  const rows=sites.filter(s=>s.active&&s.poured<s.total).map(s=>{
+    return `<div>· <b style="color:#e6edf6">${s.name}</b>:浇筑 ${s.pourRate} m³/h ×
+      循环 ${Math.round(cycleMin(s))} 分 ÷ 单车 ${CFG.truckCap} 方
+      ⇒ 需 <b style="color:#3aa0ff">${needTrucks(s)}</b> 台连续保供</div>`;
+  }).join("");
+  document.getElementById("formula").innerHTML=
+    `<div style="margin-bottom:6px">所需车数 = 浇筑速度 × 循环时间 ÷ 单车方量;循环时间 = 装料 + 去程 + 卸料 + 返程</div>`+
+    (rows||'<div style="color:#586a85">暂无在浇工地</div>');
+}
+
+// ---- 地图绘制 ----
+const cv=document.getElementById("map"); const ctx=cv.getContext("2d");
+function resizeCv(){ const r=cv.parentElement.getBoundingClientRect();
+  cv.width=r.width*devicePixelRatio; cv.height=r.height*devicePixelRatio;
+  ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0); }
+function drawMap(){
+  const w=cv.width/devicePixelRatio,h=cv.height/devicePixelRatio;
+  ctx.clearRect(0,0,w,h);
+  const P=p=>({x:p.x*w,y:p.y*h});
+  // 路线
+  ctx.lineWidth=1.4; ctx.setLineDash([5,6]);
+  for(const s of sites){ if(!s.active)continue;
+    const a=P(PLANT),b=P(s);
+    ctx.strokeStyle="#2a3a52"; ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
+  }
+  ctx.setLineDash([]);
+  // 工地
+  for(const s of sites){ if(!s.active)continue; const p=P(s);
+    const st=siteStatus(s);
+    const c={ok:"#2ecc71",warn:"#f1c40f",cut:"#e74c3c",jam:"#9b59b6",done:"#586a85"}[st.k];
+    ctx.fillStyle=c+"22"; ctx.beginPath();ctx.arc(p.x,p.y,18,0,7);ctx.fill();
+    ctx.fillStyle=c; ctx.beginPath();ctx.arc(p.x,p.y,7,0,7);ctx.fill();
+    ctx.fillStyle="#cfe0f5"; ctx.font="12px sans-serif"; ctx.textAlign="center";
+    ctx.fillText(s.name,p.x,p.y-14);
+    ctx.fillStyle="#8aa0bd"; ctx.font="10px sans-serif";
+    ctx.fillText(Math.round(s.poured)+"/"+s.total+"m³",p.x,p.y+26);
+  }
+  // 搅拌站
+  const pp=P(PLANT);
+  ctx.fillStyle="#3aa0ff"; ctx.fillRect(pp.x-11,pp.y-11,22,22);
+  ctx.fillStyle="#04203f"; ctx.font="13px sans-serif"; ctx.textAlign="center";
+  ctx.fillText("站",pp.x,pp.y+5);
+  ctx.fillStyle="#cfe0f5"; ctx.font="11px sans-serif"; ctx.fillText("搅拌站",pp.x,pp.y-16);
+  // 车辆
+  for(const t of trucks){
+    if(t.state==="idle"||t.state==="park")continue;
+    const p=P(t);
+    const c={load:"#f1c40f",go:"#3aa0ff",unload:"#2ecc71",back:"#7fb8ff"}[t.state]||"#fff";
+    const col=t.ext?"#c89bff":c;
+    ctx.fillStyle=col; ctx.beginPath();ctx.arc(p.x,p.y,4.5,0,7);ctx.fill();
+    ctx.strokeStyle="#0f1521";ctx.lineWidth=1.2;ctx.stroke();
+  }
+}
+
+function renderAll(){ renderKPI(); renderSites(); renderTrucks(); renderSuggestions(); renderFormula(); drawMap(); }
+
+// ---- 主循环 ----
+let acc=0,last=performance.now();
+function loop(now){
+  const real=(now-last)/1000; last=now;
+  if(speed>0){
+    acc += real*speed*0.5; // 0.5 => 每真实秒 ~0.5*speed 仿真分钟
+    while(acc>=1){ step(1); acc-=1; }
+  }
+  renderAll();
+  requestAnimationFrame(loop);
+}
+
+// ---- 控制 ----
+document.getElementById("speed").addEventListener("click",e=>{
+  const b=e.target.closest("button"); if(!b)return;
+  speed=+b.dataset.s;
+  [...e.currentTarget.children].forEach(x=>x.classList.toggle("on",x===b));
+});
+document.getElementById("resetBtn").onclick=()=>{ if(confirm("重置仿真?"))init(); };
+document.getElementById("fltActive").onchange=renderTrucks;
+document.getElementById("addSite").onclick=()=>{
+  const name=prompt("工地名称:","新工地"); if(!name)return;
+  const rate=+prompt("浇筑速度 m³/h:","24")||24;
+  const total=+prompt("总方量 m³:","300")||300;
+  sites.push(mkSite(name, 0.2+Math.random()*0.6, 0.2+Math.random()*0.6, rate, total));
+  renderAll();
+};
+window.addEventListener("resize",()=>{resizeCv();drawMap();});
+
+function init(){
+  simMin=CFG.startMin; speed=1; wasteVol=0; extSeq=0; siteSeq=0;
+  sites=defaultSites(); initTrucks();
+  document.querySelectorAll("#speed button").forEach(x=>x.classList.toggle("on",x.dataset.s==="1"));
+  resizeCv(); renderAll();
+}
+init();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
