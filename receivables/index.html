@@ -1,0 +1,635 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>混凝土应收账款催收管理</title>
+<style>
+  :root{
+    --bg:#f4f6f9; --panel:#ffffff; --line:#e6e9ef; --text:#1f2733; --muted:#7a8699;
+    --brand:#2f6bff; --brand-d:#2455d6;
+    --red:#e5484d; --red-bg:#fdecec;
+    --amber:#e8940c; --amber-bg:#fdf3e3;
+    --green:#2f9e56; --green-bg:#e9f6ee;
+    --gray:#8a94a6; --gray-bg:#eef1f5;
+    --shadow:0 1px 3px rgba(20,30,50,.08),0 6px 20px rgba(20,30,50,.06);
+    --radius:12px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg); color:var(--text); font-size:14px; line-height:1.5; -webkit-font-smoothing:antialiased;
+  }
+  button{font-family:inherit; cursor:pointer}
+  input,select,textarea{font-family:inherit; font-size:14px}
+
+  /* Layout */
+  .app{max-width:1280px; margin:0 auto; padding:18px 20px 60px}
+  header.top{display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-bottom:16px}
+  .logo{display:flex; align-items:center; gap:10px}
+  .logo .mark{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--brand),#5b8bff);display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;box-shadow:var(--shadow)}
+  .logo h1{font-size:18px; margin:0; font-weight:700; letter-spacing:.5px}
+  .logo .sub{font-size:12px; color:var(--muted)}
+  .top .spacer{flex:1}
+
+  /* Buttons */
+  .btn{border:1px solid var(--line); background:var(--panel); color:var(--text); padding:8px 14px; border-radius:9px; font-size:13px; font-weight:600; transition:.15s; white-space:nowrap}
+  .btn:hover{border-color:#c9d1de; box-shadow:var(--shadow)}
+  .btn.primary{background:var(--brand); border-color:var(--brand); color:#fff}
+  .btn.primary:hover{background:var(--brand-d)}
+  .btn.ghost{background:transparent; border-color:transparent; color:var(--muted)}
+  .btn.ghost:hover{background:#eef1f5; color:var(--text)}
+  .btn.sm{padding:5px 10px; font-size:12px; border-radius:7px}
+  .btn.danger{color:var(--red); border-color:#f3c9ca}
+  .btn.danger:hover{background:var(--red-bg)}
+
+  /* Stat cards */
+  .stats{display:grid; grid-template-columns:repeat(5,1fr); gap:12px; margin-bottom:16px}
+  .card{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:14px 16px; box-shadow:var(--shadow)}
+  .card .label{font-size:12px; color:var(--muted); margin-bottom:6px; display:flex; align-items:center; gap:6px}
+  .card .value{font-size:22px; font-weight:800; letter-spacing:.3px}
+  .card .value small{font-size:12px; font-weight:600; color:var(--muted)}
+  .dot{width:8px;height:8px;border-radius:50%}
+  .dot.red{background:var(--red)} .dot.amber{background:var(--amber)} .dot.green{background:var(--green)} .dot.blue{background:var(--brand)} .dot.gray{background:var(--gray)}
+  .card.clickable{cursor:pointer} .card.clickable:hover{border-color:#c9d1de}
+  .card.active{outline:2px solid var(--brand); outline-offset:-1px}
+
+  /* Toolbar */
+  .toolbar{display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:14px}
+  .tabs{display:flex; gap:4px; background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:4px}
+  .tab{border:none; background:transparent; padding:7px 14px; border-radius:7px; font-size:13px; font-weight:600; color:var(--muted)}
+  .tab.active{background:var(--brand); color:#fff}
+  .search{flex:1; min-width:180px; position:relative}
+  .search input{width:100%; padding:9px 12px 9px 34px; border:1px solid var(--line); border-radius:9px; background:var(--panel); outline:none}
+  .search input:focus{border-color:var(--brand)}
+  .search .ic{position:absolute; left:11px; top:50%; transform:translateY(-50%); color:var(--muted)}
+  select.sort{padding:9px 12px; border:1px solid var(--line); border-radius:9px; background:var(--panel); outline:none}
+
+  /* Table */
+  .tablewrap{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); overflow-x:auto}
+  table{width:100%; border-collapse:collapse; min-width:940px}
+  th,td{text-align:left; padding:12px 14px; border-bottom:1px solid var(--line); vertical-align:middle}
+  th{font-size:12px; color:var(--muted); font-weight:600; background:#fafbfd; position:sticky; top:0; white-space:nowrap}
+  tbody tr:hover{background:#fafbff}
+  tbody tr:last-child td{border-bottom:none}
+  td.num{text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap}
+  .cust{font-weight:700}
+  .meta{font-size:12px; color:var(--muted); margin-top:2px}
+  .badge{display:inline-flex; align-items:center; gap:5px; padding:3px 9px; border-radius:20px; font-size:12px; font-weight:700; white-space:nowrap}
+  .badge.red{background:var(--red-bg); color:var(--red)}
+  .badge.amber{background:var(--amber-bg); color:var(--amber)}
+  .badge.green{background:var(--green-bg); color:var(--green)}
+  .badge.gray{background:var(--gray-bg); color:var(--gray)}
+  .rowtag{font-size:11px; color:var(--muted); margin-top:3px}
+  .prog{height:6px; background:#eef1f5; border-radius:4px; overflow:hidden; margin-top:5px; width:120px}
+  .prog > i{display:block; height:100%; background:var(--green)}
+  .empty{padding:60px 20px; text-align:center; color:var(--muted)}
+  .empty .big{font-size:40px; margin-bottom:10px}
+
+  /* Modal */
+  .mask{position:fixed; inset:0; background:rgba(20,28,44,.42); display:none; align-items:flex-start; justify-content:center; padding:40px 16px; z-index:50; overflow-y:auto}
+  .mask.show{display:flex}
+  .modal{background:var(--panel); width:100%; max-width:720px; border-radius:16px; box-shadow:0 20px 60px rgba(20,30,50,.3); overflow:hidden}
+  .modal.wide{max-width:820px}
+  .modal h2{margin:0; font-size:16px}
+  .mhead{display:flex; align-items:center; justify-content:space-between; padding:18px 22px; border-bottom:1px solid var(--line)}
+  .mbody{padding:20px 22px; max-height:66vh; overflow-y:auto}
+  .mfoot{display:flex; justify-content:flex-end; gap:10px; padding:16px 22px; border-top:1px solid var(--line); background:#fafbfd}
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+  .grid3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px}
+  .field{margin-bottom:14px}
+  .field label{display:block; font-size:12px; color:var(--muted); margin-bottom:5px; font-weight:600}
+  .field label .req{color:var(--red)}
+  .field input,.field select,.field textarea{width:100%; padding:9px 11px; border:1px solid var(--line); border-radius:9px; outline:none; background:#fff}
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--brand)}
+  .field textarea{resize:vertical; min-height:60px}
+  .hint{font-size:11px; color:var(--muted); margin-top:4px}
+  .section-title{font-size:13px; font-weight:700; margin:18px 0 10px; padding-top:14px; border-top:1px dashed var(--line); display:flex; align-items:center; justify-content:space-between}
+  .section-title:first-child{border-top:none; padding-top:0; margin-top:0}
+
+  /* Follow-up list */
+  .fu{border:1px solid var(--line); border-radius:10px; padding:10px 12px; margin-bottom:10px; background:#fafbfd}
+  .fu .fu-top{display:flex; justify-content:space-between; align-items:center; gap:8px}
+  .fu .fu-date{font-weight:700; font-size:13px}
+  .fu .fu-method{font-size:11px; color:var(--muted); background:#eef1f5; padding:2px 8px; border-radius:12px}
+  .fu .fu-reply{margin-top:6px; font-size:13px; color:var(--text)}
+  .fu .fu-next{margin-top:6px; font-size:12px; color:var(--amber)}
+  .fu-add{display:grid; grid-template-columns:130px 120px 1fr auto; gap:8px; align-items:start; margin-top:6px}
+  .kv{display:flex; gap:22px; flex-wrap:wrap; margin-bottom:6px; font-size:13px}
+  .kv b{font-weight:700}
+  .amount-red{color:var(--red); font-weight:800}
+  .footer-note{text-align:center; color:var(--muted); font-size:12px; margin-top:26px; line-height:1.8}
+  .footer-note a{color:var(--brand); text-decoration:none}
+
+  .toast{position:fixed; bottom:26px; left:50%; transform:translateX(-50%) translateY(20px); background:#1f2733; color:#fff; padding:11px 20px; border-radius:10px; font-size:13px; opacity:0; pointer-events:none; transition:.25s; z-index:100; box-shadow:0 8px 30px rgba(0,0,0,.25)}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+
+  @media (max-width:900px){
+    .stats{grid-template-columns:repeat(2,1fr)}
+    .grid3,.grid2{grid-template-columns:1fr}
+    .fu-add{grid-template-columns:1fr 1fr}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="logo">
+      <div class="mark">🏗️</div>
+      <div>
+        <h1>混凝土应收账款催收管理</h1>
+        <div class="sub">轮动催收 · 逾期预警 · 台账管理</div>
+      </div>
+    </div>
+    <div class="spacer"></div>
+    <button class="btn" id="btnSettings">⚙️ 预警设置</button>
+    <button class="btn" id="btnExport">导出</button>
+    <button class="btn" id="btnImport">导入</button>
+    <button class="btn primary" id="btnAdd">＋ 新增应收</button>
+  </header>
+
+  <section class="stats" id="stats"></section>
+
+  <div class="toolbar">
+    <div class="tabs" id="tabs">
+      <button class="tab active" data-tab="all">全部台账</button>
+      <button class="tab" data-tab="today">今日催收</button>
+      <button class="tab" data-tab="settled">已结清</button>
+    </div>
+    <div class="search">
+      <span class="ic">🔍</span>
+      <input id="search" placeholder="搜索客户 / 合同号 / 工程名称…" />
+    </div>
+    <select class="sort" id="sort">
+      <option value="priority">按催收优先级</option>
+      <option value="remaining">按未收金额</option>
+      <option value="due">按到期日</option>
+      <option value="overdue">按逾期天数</option>
+      <option value="customer">按客户名称</option>
+    </select>
+  </div>
+
+  <div class="tablewrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:20%">客户 / 工程</th>
+          <th style="width:15%">合同</th>
+          <th class="num">合同总额</th>
+          <th class="num">已收 / 未收</th>
+          <th style="width:13%">约定付款日</th>
+          <th style="width:14%">状态</th>
+          <th style="width:12%">最近催收</th>
+          <th style="width:90px"></th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <div class="empty" id="empty" style="display:none">
+      <div class="big">📭</div>
+      <div id="emptyText">暂无记录，点击右上角「＋ 新增应收」开始建立台账</div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    数据仅保存在本机浏览器（localStorage），不会上传到任何服务器。<br/>
+    建议定期点击「导出」备份到本地文件，以防清理浏览器缓存时丢失。
+  </div>
+</div>
+
+<!-- 新增/编辑 弹窗 -->
+<div class="mask" id="editMask">
+  <div class="modal wide">
+    <div class="mhead">
+      <h2 id="editTitle">新增应收账款</h2>
+      <button class="btn ghost" id="editClose">✕</button>
+    </div>
+    <div class="mbody">
+      <div class="section-title">基本信息</div>
+      <div class="grid2">
+        <div class="field"><label>客户名称 <span class="req">*</span></label><input id="f_customer" placeholder="如：XX建筑工程有限公司" /></div>
+        <div class="field"><label>工程 / 项目名称</label><input id="f_project" placeholder="如：XX路桥梁工程" /></div>
+      </div>
+      <div class="grid3">
+        <div class="field"><label>合同编号</label><input id="f_contract" placeholder="如：HT-2026-001" /></div>
+        <div class="field"><label>联系人 / 电话</label><input id="f_contact" placeholder="如：张经理 138…" /></div>
+        <div class="field"><label>混凝土标号</label><input id="f_grade" placeholder="如：C30" /></div>
+      </div>
+
+      <div class="section-title">金额核算</div>
+      <div class="grid3">
+        <div class="field"><label>方量 (m³)</label><input id="f_qty" type="number" step="0.01" placeholder="如：1200" /></div>
+        <div class="field"><label>单价 (元/m³)</label><input id="f_price" type="number" step="0.01" placeholder="如：420" /></div>
+        <div class="field"><label>合同总额 (元) <span class="req">*</span></label><input id="f_amount" type="number" step="0.01" placeholder="方量×单价可自动填" /></div>
+      </div>
+      <div class="grid2">
+        <div class="field"><label>已收金额 (元)</label><input id="f_received" type="number" step="0.01" placeholder="默认 0" /></div>
+        <div class="field"><label>未收余额</label><input id="f_remaining" disabled placeholder="自动计算" /></div>
+      </div>
+
+      <div class="section-title">付款计划 / 账期</div>
+      <div class="grid3">
+        <div class="field"><label>供货 / 发货日期</label><input id="f_delivery" type="date" /></div>
+        <div class="field"><label>账期 (天)</label><input id="f_term" type="number" placeholder="如：30" /><div class="hint">填发货日+账期可自动算到期日</div></div>
+        <div class="field"><label>约定付款日期 <span class="req">*</span></label><input id="f_due" type="date" /></div>
+      </div>
+      <div class="field"><label>备注</label><textarea id="f_note" placeholder="其他说明…"></textarea></div>
+
+      <div class="section-title">催收记录 <button class="btn sm" id="fuAddBtn">＋ 新增一条催收</button></div>
+      <div class="fu-add">
+        <input id="fu_date" type="date" />
+        <select id="fu_method"><option>电话</option><option>微信</option><option>短信</option><option>上门</option><option>函件</option><option>其他</option></select>
+        <input id="fu_reply" placeholder="对方答复 / 情况说明" />
+        <input id="fu_next" type="date" title="下次跟进日期" />
+      </div>
+      <div class="hint" style="margin-bottom:10px">填写上方后点「＋ 新增一条催收」加入下方列表</div>
+      <div id="fuList"></div>
+    </div>
+    <div class="mfoot">
+      <button class="btn danger" id="editDelete" style="margin-right:auto; display:none">删除此记录</button>
+      <button class="btn" id="editCancel">取消</button>
+      <button class="btn primary" id="editSave">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- 设置 弹窗 -->
+<div class="mask" id="setMask">
+  <div class="modal">
+    <div class="mhead"><h2>预警规则设置</h2><button class="btn ghost" id="setClose">✕</button></div>
+    <div class="mbody">
+      <div class="field">
+        <label>「临近到期」提前天数</label>
+        <input id="s_near" type="number" />
+        <div class="hint">距约定付款日在该天数内且未结清 → 黄色「临近到期」提醒</div>
+      </div>
+      <div class="field">
+        <label>「长期未跟进」天数</label>
+        <input id="s_stale" type="number" />
+        <div class="hint">距上次催收超过该天数且仍有欠款 → 黄色「久未跟进」提醒</div>
+      </div>
+      <div class="hint">逾期规则固定：超过约定付款日仍未结清 → 红色「已逾期」紧急催款。</div>
+    </div>
+    <div class="mfoot">
+      <button class="btn danger" id="clearAll" style="margin-right:auto">清空全部数据</button>
+      <button class="btn" id="setCancel">取消</button>
+      <button class="btn primary" id="setSave">保存设置</button>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="importFile" accept="application/json" style="display:none" />
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+(function(){
+  const LS_DATA = "concrete_ar_records_v1";
+  const LS_CFG  = "concrete_ar_config_v1";
+  const $ = s => document.querySelector(s);
+  const fmt = n => (Number(n)||0).toLocaleString("zh-CN",{maximumFractionDigits:2});
+  const money = n => "¥" + fmt(n);
+  const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+  const today = () => { const d=new Date(); d.setHours(0,0,0,0); return d; };
+  const parseDate = s => { if(!s) return null; const d=new Date(s+"T00:00:00"); return isNaN(d)?null:d; };
+  const dayDiff = (a,b) => Math.round((a-b)/86400000); // a - b in days
+
+  let cfg = { nearDays:7, staleDays:15 };
+  let records = [];
+  let state = { tab:"all", search:"", sort:"priority", editingId:null, draftFollowUps:[] };
+
+  /* ---------- storage ---------- */
+  function load(){
+    try{ const c=JSON.parse(localStorage.getItem(LS_CFG)); if(c) cfg={...cfg,...c}; }catch(e){}
+    try{ const d=JSON.parse(localStorage.getItem(LS_DATA)); if(Array.isArray(d)) records=d; }catch(e){}
+    if(localStorage.getItem(LS_DATA)===null){ records = demoData(); save(); }
+  }
+  function save(){ localStorage.setItem(LS_DATA, JSON.stringify(records)); }
+  function saveCfg(){ localStorage.setItem(LS_CFG, JSON.stringify(cfg)); }
+
+  /* ---------- status engine ---------- */
+  // returns {key, label, color, days, priority}
+  function evalStatus(r){
+    const remaining = (Number(r.amount)||0) - (Number(r.received)||0);
+    if(remaining <= 0.001){
+      return {key:"settled", label:"已结清", color:"gray", remaining, priority:-1};
+    }
+    const t = today();
+    const due = parseDate(r.due);
+    const lastFu = r.followUps && r.followUps.length ? parseDate(r.followUps[r.followUps.length-1].date) : null;
+    const staleDays = lastFu ? dayDiff(t,lastFu) : (r.createdAt ? dayDiff(t,new Date(r.createdAt)) : 999);
+
+    if(due){
+      const od = dayDiff(t, due); // >0 overdue
+      if(od > 0){
+        // priority weighted by overdue days & amount
+        return {key:"overdue", label:`已逾期 ${od} 天`, color:"red", remaining,
+          priority: 1e12 + od*1e6 + remaining};
+      }
+      if(od >= -cfg.nearDays){
+        const left = -od;
+        return {key:"near", label: left===0?"今日到期":`${left} 天后到期`, color:"amber", remaining,
+          priority: 8e11 - left*1e6 + remaining};
+      }
+    }
+    if(staleDays > cfg.staleDays){
+      return {key:"stale", label:`久未跟进 ${staleDays} 天`, color:"amber", remaining,
+        priority: 5e11 + staleDays*1e6 + remaining};
+    }
+    return {key:"normal", label:"正常", color:"green", remaining, priority: remaining};
+  }
+
+  /* ---------- rendering ---------- */
+  function computeRows(){
+    return records.map(r => ({r, st:evalStatus(r)}));
+  }
+  function renderStats(){
+    const all = computeRows();
+    const active = all.filter(x=>x.st.key!=="settled");
+    const totalReceivable = active.reduce((s,x)=>s+x.st.remaining,0);
+    const overdue = active.filter(x=>x.st.key==="overdue");
+    const overdueAmt = overdue.reduce((s,x)=>s+x.st.remaining,0);
+    const urgent = active.filter(x=>x.st.color==="red"||x.st.color==="amber");
+    const settledCount = all.length - active.length;
+    const stats = [
+      {label:"应收总额", dot:"blue", value:money(totalReceivable), sub:`${active.length} 笔未结清`, tab:null},
+      {label:"已逾期(紧急)", dot:"red", value:money(overdueAmt), sub:`${overdue.length} 笔需催款`, tab:"overdue"},
+      {label:"待跟进提醒", dot:"amber", value:urgent.length-overdue.length+" 笔", sub:"临近/久未跟进", tab:"todo"},
+      {label:"今日催收清单", dot:"amber", value:urgent.length+" 笔", sub:"点击查看轮动清单", tab:"today"},
+      {label:"已结清", dot:"green", value:settledCount+" 笔", sub:"已全额收款", tab:"settled"},
+    ];
+    $("#stats").innerHTML = stats.map((s,i)=>`
+      <div class="card clickable" data-jump="${s.tab||""}">
+        <div class="label"><span class="dot ${s.dot}"></span>${s.label}</div>
+        <div class="value">${s.value}</div>
+        <div class="meta">${s.sub}</div>
+      </div>`).join("");
+    document.querySelectorAll("#stats .card").forEach(c=>{
+      c.onclick=()=>{ const j=c.getAttribute("data-jump");
+        if(j==="today"||j==="settled"){ switchTab(j); }
+        else if(j==="overdue"){ switchTab("all"); state.sort="overdue"; $("#sort").value="overdue"; render(); }
+        else if(j==="todo"){ switchTab("today"); }
+      };
+    });
+  }
+
+  function matchSearch(r){
+    const q = state.search.trim().toLowerCase();
+    if(!q) return true;
+    return [r.customer,r.project,r.contract,r.contact,r.grade].some(v=>(v||"").toLowerCase().includes(q));
+  }
+
+  function currentList(){
+    let list = computeRows().filter(x=>matchSearch(x.r));
+    if(state.tab==="settled") list = list.filter(x=>x.st.key==="settled");
+    else if(state.tab==="today") list = list.filter(x=>x.st.color==="red"||x.st.color==="amber");
+    else list = list.filter(x=>x.st.key!=="settled");
+
+    const s = state.sort;
+    list.sort((a,b)=>{
+      if(s==="priority") return b.st.priority - a.st.priority;
+      if(s==="remaining") return b.st.remaining - a.st.remaining;
+      if(s==="overdue"){ const oa=a.st.key==="overdue"?a.st.priority:0, ob=b.st.key==="overdue"?b.st.priority:0; return ob-oa; }
+      if(s==="customer") return (a.r.customer||"").localeCompare(b.r.customer||"","zh");
+      if(s==="due"){ const da=parseDate(a.r.due)||new Date(8640000000000000), db=parseDate(b.r.due)||new Date(8640000000000000); return da-db; }
+      return 0;
+    });
+    return list;
+  }
+
+  function render(){
+    renderStats();
+    const list = currentList();
+    const tbody = $("#rows");
+    if(!list.length){
+      tbody.innerHTML=""; $("#empty").style.display="block";
+      $("#emptyText").textContent = state.search ? "没有匹配的记录" :
+        (state.tab==="today" ? "🎉 今日没有需要催收的账款" :
+         state.tab==="settled" ? "还没有已结清的账款" :
+         "暂无记录，点击右上角「＋ 新增应收」开始建立台账");
+      return;
+    }
+    $("#empty").style.display="none";
+    tbody.innerHTML = list.map(({r,st})=>{
+      const remaining = st.remaining;
+      const pct = r.amount>0 ? Math.min(100,Math.round((Number(r.received)||0)/r.amount*100)) : 0;
+      const lastFu = r.followUps && r.followUps.length ? r.followUps[r.followUps.length-1] : null;
+      const dueTxt = r.due ? r.due : "—";
+      return `<tr data-id="${r.id}">
+        <td>
+          <div class="cust">${esc(r.customer||"未命名客户")}</div>
+          <div class="meta">${esc(r.project||"")}${r.grade?" · "+esc(r.grade):""}</div>
+        </td>
+        <td>
+          <div>${esc(r.contract||"—")}</div>
+          <div class="meta">${r.qty?fmt(r.qty)+"m³":""}${r.qty&&r.price?" × ":""}${r.price?"¥"+fmt(r.price):""}</div>
+        </td>
+        <td class="num">${money(r.amount)}</td>
+        <td class="num">
+          <div style="color:var(--green)">${money(r.received)}</div>
+          <div class="${remaining>0?'amount-red':''}">${money(remaining)}</div>
+          <div class="prog"><i style="width:${pct}%;background:${pct>=100?'var(--green)':'var(--brand)'}"></i></div>
+        </td>
+        <td>${dueTxt}${r.term?`<div class="meta">账期 ${r.term} 天</div>`:""}</td>
+        <td><span class="badge ${st.color}"><span class="dot ${st.color}"></span>${st.label}</span></td>
+        <td>${lastFu?`<div>${lastFu.date}</div><div class="meta">${esc(lastFu.method||"")}</div>`:'<span class="meta">未催收</span>'}</td>
+        <td><button class="btn sm" data-edit="${r.id}">查看/编辑</button></td>
+      </tr>`;
+    }).join("");
+    tbody.querySelectorAll("[data-edit]").forEach(b=> b.onclick=()=>openEdit(b.getAttribute("data-edit")));
+  }
+  function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+  /* ---------- tabs / toolbar ---------- */
+  function switchTab(t){
+    state.tab=t;
+    document.querySelectorAll(".tab").forEach(el=>el.classList.toggle("active", el.getAttribute("data-tab")===t));
+    render();
+  }
+  $("#tabs").onclick = e => { const t=e.target.getAttribute("data-tab"); if(t) switchTab(t); };
+  $("#search").oninput = e => { state.search=e.target.value; render(); };
+  $("#sort").onchange = e => { state.sort=e.target.value; render(); };
+
+  /* ---------- edit modal ---------- */
+  function bindAutoCalc(){
+    const recalc=()=>{
+      const q=parseFloat($("#f_qty").value), p=parseFloat($("#f_price").value);
+      if(!isNaN(q)&&!isNaN(p) && !$("#f_amount").dataset.touched) $("#f_amount").value=(q*p).toFixed(2);
+      const amt=parseFloat($("#f_amount").value)||0, rec=parseFloat($("#f_received").value)||0;
+      $("#f_remaining").value = fmt(amt-rec);
+    };
+    ["f_qty","f_price","f_received"].forEach(id=>$("#"+id).addEventListener("input",recalc));
+    $("#f_amount").addEventListener("input",()=>{$("#f_amount").dataset.touched="1"; recalc();});
+    const dueCalc=()=>{
+      const dv=$("#f_delivery").value, tm=parseInt($("#f_term").value);
+      if(dv && !isNaN(tm) && !$("#f_due").dataset.touched){
+        const d=new Date(dv+"T00:00:00"); d.setDate(d.getDate()+tm);
+        $("#f_due").value=d.toISOString().slice(0,10);
+      }
+    };
+    $("#f_delivery").addEventListener("input",dueCalc);
+    $("#f_term").addEventListener("input",dueCalc);
+    $("#f_due").addEventListener("input",()=>{$("#f_due").dataset.touched="1";});
+  }
+
+  function openEdit(id){
+    const r = id ? records.find(x=>x.id===id) : null;
+    state.editingId = id || null;
+    state.draftFollowUps = r && r.followUps ? JSON.parse(JSON.stringify(r.followUps)) : [];
+    $("#editTitle").textContent = r ? "编辑应收账款" : "新增应收账款";
+    $("#editDelete").style.display = r ? "inline-block" : "none";
+    const g=(k,v="")=> $("#f_"+k).value = (r&&r[k]!=null)?r[k]:v;
+    g("customer");g("project");g("contract");g("contact");g("grade");
+    g("qty");g("price");g("amount");g("received");g("delivery");g("term");g("due");g("note");
+    $("#f_amount").dataset.touched = r&&r.amount ? "1":"";
+    $("#f_due").dataset.touched = r&&r.due ? "1":"";
+    $("#f_remaining").value = fmt(((r&&r.amount)||0)-((r&&r.received)||0));
+    $("#fu_date").value = new Date().toISOString().slice(0,10);
+    $("#fu_reply").value=""; $("#fu_next").value="";
+    renderDraftFu();
+    $("#editMask").classList.add("show");
+  }
+  function renderDraftFu(){
+    const el=$("#fuList");
+    if(!state.draftFollowUps.length){ el.innerHTML='<div class="hint">暂无催收记录</div>'; return; }
+    el.innerHTML = state.draftFollowUps.map((f,i)=>`
+      <div class="fu">
+        <div class="fu-top">
+          <span class="fu-date">${f.date} <span class="fu-method">${esc(f.method||"")}</span></span>
+          <button class="btn ghost sm" data-del-fu="${i}">删除</button>
+        </div>
+        ${f.reply?`<div class="fu-reply">${esc(f.reply)}</div>`:""}
+        ${f.next?`<div class="fu-next">📅 下次跟进：${f.next}</div>`:""}
+      </div>`).join("");
+    el.querySelectorAll("[data-del-fu]").forEach(b=> b.onclick=()=>{ state.draftFollowUps.splice(+b.getAttribute("data-del-fu"),1); renderDraftFu(); });
+  }
+  $("#fuAddBtn").onclick = ()=>{
+    const date=$("#fu_date").value; if(!date){ toast("请选择催收日期"); return; }
+    state.draftFollowUps.push({date, method:$("#fu_method").value, reply:$("#fu_reply").value.trim(), next:$("#fu_next").value});
+    state.draftFollowUps.sort((a,b)=> (a.date<b.date?-1:1));
+    $("#fu_reply").value=""; $("#fu_next").value="";
+    renderDraftFu();
+  };
+  function closeEdit(){ $("#editMask").classList.remove("show"); }
+  $("#editClose").onclick=closeEdit; $("#editCancel").onclick=closeEdit;
+  $("#editMask").onclick = e=>{ if(e.target.id==="editMask") closeEdit(); };
+
+  $("#editSave").onclick = ()=>{
+    const customer=$("#f_customer").value.trim();
+    const amount=parseFloat($("#f_amount").value);
+    const due=$("#f_due").value;
+    if(!customer){ toast("请填写客户名称"); return; }
+    if(isNaN(amount)||amount<=0){ toast("请填写合同总额"); return; }
+    if(!due){ toast("请填写约定付款日期"); return; }
+    const rec = {
+      id: state.editingId || uid(),
+      customer, project:$("#f_project").value.trim(), contract:$("#f_contract").value.trim(),
+      contact:$("#f_contact").value.trim(), grade:$("#f_grade").value.trim(),
+      qty:num($("#f_qty").value), price:num($("#f_price").value),
+      amount, received:num($("#f_received").value)||0,
+      delivery:$("#f_delivery").value, term:num($("#f_term").value), due,
+      note:$("#f_note").value.trim(),
+      followUps: state.draftFollowUps,
+      createdAt: state.editingId ? (records.find(x=>x.id===state.editingId)||{}).createdAt || Date.now() : Date.now(),
+      updatedAt: Date.now(),
+    };
+    if(state.editingId){ const i=records.findIndex(x=>x.id===state.editingId); records[i]=rec; }
+    else records.push(rec);
+    save(); closeEdit(); render(); toast(state.editingId?"已保存修改":"已新增记录");
+  };
+  $("#editDelete").onclick = ()=>{
+    if(!state.editingId) return;
+    if(!confirm("确定删除该客户的这笔应收记录？此操作不可恢复。")) return;
+    records = records.filter(x=>x.id!==state.editingId);
+    save(); closeEdit(); render(); toast("已删除");
+  };
+  function num(v){ const n=parseFloat(v); return isNaN(n)?"":n; }
+
+  $("#btnAdd").onclick = ()=>openEdit(null);
+
+  /* ---------- settings ---------- */
+  $("#btnSettings").onclick = ()=>{ $("#s_near").value=cfg.nearDays; $("#s_stale").value=cfg.staleDays; $("#setMask").classList.add("show"); };
+  const closeSet=()=>$("#setMask").classList.remove("show");
+  $("#setClose").onclick=closeSet; $("#setCancel").onclick=closeSet;
+  $("#setMask").onclick=e=>{ if(e.target.id==="setMask") closeSet(); };
+  $("#setSave").onclick = ()=>{
+    cfg.nearDays = Math.max(0, parseInt($("#s_near").value)||0);
+    cfg.staleDays = Math.max(0, parseInt($("#s_stale").value)||0);
+    saveCfg(); closeSet(); render(); toast("设置已保存");
+  };
+  $("#clearAll").onclick = ()=>{
+    if(!confirm("将清空全部应收账款数据，且不可恢复。建议先导出备份。确定清空？")) return;
+    records=[]; save(); closeSet(); render(); toast("已清空全部数据");
+  };
+
+  /* ---------- import / export ---------- */
+  $("#btnExport").onclick = ()=>{
+    const menu = confirm("点「确定」导出 JSON 备份（可再次导入）；点「取消」导出 CSV 表格（可用 Excel 打开）。");
+    if(menu) exportJSON(); else exportCSV();
+  };
+  function exportJSON(){
+    const blob = new Blob([JSON.stringify({config:cfg,records},null,2)],{type:"application/json"});
+    download(blob, `应收账款备份_${dateStr()}.json`);
+    toast("已导出 JSON 备份");
+  }
+  function exportCSV(){
+    const head=["客户","工程","合同号","标号","方量","单价","合同总额","已收","未收","约定付款日","账期","状态","最近催收日","备注"];
+    const lines=[head.join(",")];
+    computeRows().forEach(({r,st})=>{
+      const lastFu = r.followUps&&r.followUps.length?r.followUps[r.followUps.length-1].date:"";
+      const row=[r.customer,r.project,r.contract,r.grade,r.qty,r.price,r.amount,r.received,st.remaining,r.due,r.term,st.label,lastFu,r.note]
+        .map(v=>`"${String(v==null?"":v).replace(/"/g,'""')}"`);
+      lines.push(row.join(","));
+    });
+    const blob=new Blob(["﻿"+lines.join("\r\n")],{type:"text/csv;charset=utf-8"});
+    download(blob, `应收账款_${dateStr()}.csv`);
+    toast("已导出 CSV 表格");
+  }
+  function download(blob,name){ const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1000); }
+  function dateStr(){ return new Date().toISOString().slice(0,10); }
+
+  $("#btnImport").onclick = ()=>$("#importFile").click();
+  $("#importFile").onchange = e=>{
+    const file=e.target.files[0]; if(!file) return;
+    const reader=new FileReader();
+    reader.onload=()=>{
+      try{
+        const data=JSON.parse(reader.result);
+        const incoming = Array.isArray(data)?data:(data.records||[]);
+        if(!Array.isArray(incoming)) throw new Error("格式错误");
+        if(!confirm(`将导入 ${incoming.length} 条记录。点「确定」合并到现有数据，点「取消」中止。`)) return;
+        const map={}; records.forEach(r=>map[r.id]=r); incoming.forEach(r=>{ if(!r.id) r.id=uid(); map[r.id]=r; });
+        records=Object.values(map);
+        if(data.config) { cfg={...cfg,...data.config}; saveCfg(); }
+        save(); render(); toast(`已导入，共 ${records.length} 条记录`);
+      }catch(err){ toast("导入失败：文件格式不正确"); }
+    };
+    reader.readAsText(file); e.target.value="";
+  };
+
+  /* ---------- toast ---------- */
+  let toastTimer;
+  function toast(msg){ const t=$("#toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove("show"),2200); }
+
+  /* ---------- demo data ---------- */
+  function demoData(){
+    const d=(off)=>{ const x=new Date(); x.setDate(x.getDate()+off); return x.toISOString().slice(0,10); };
+    return [
+      {id:uid(),customer:"宏图建筑工程有限公司",project:"滨江路桥梁工程",contract:"HT-2026-018",contact:"张经理 138****2211",grade:"C40",qty:1560,price:445,amount:694200,received:300000,delivery:d(-60),term:30,due:d(-25),note:"二期款一直拖延",followUps:[{date:d(-20),method:"电话",reply:"称资金紧张，月底前付一部分",next:d(-5)},{date:d(-6),method:"上门",reply:"财务出差，下周处理",next:d(2)}],createdAt:Date.now()-60*86400000},
+      {id:uid(),customer:"通达房地产开发公司",project:"锦绣花园三期",contract:"HT-2026-025",contact:"李工 139****7788",grade:"C30",qty:2400,price:420,amount:1008000,received:0,delivery:d(-40),term:45,due:d(3),note:"",followUps:[{date:d(-8),method:"微信",reply:"确认到期按合同付款",next:d(3)}],createdAt:Date.now()-40*86400000},
+      {id:uid(),customer:"中建八局项目部",project:"高新区厂房",contract:"HT-2026-031",contact:"王主管 137****5566",grade:"C35",qty:980,price:435,amount:426300,received:426300,delivery:d(-50),term:30,due:d(-18),note:"已全额结清",followUps:[{date:d(-19),method:"电话",reply:"已安排付款",next:""}],createdAt:Date.now()-50*86400000},
+      {id:uid(),customer:"永盛市政工程队",project:"人民路改造",contract:"HT-2026-040",contact:"赵队 135****9900",grade:"C25",qty:620,price:398,amount:246760,received:100000,delivery:d(-30),term:60,due:d(30),note:"账期较长",followUps:[],createdAt:Date.now()-30*86400000},
+      {id:uid(),customer:"锦程物流仓储公司",project:"仓储中心地坪",contract:"HT-2026-044",contact:"孙经理 136****3344",grade:"C30",qty:1100,price:410,amount:451000,received:150000,delivery:d(-22),term:20,due:d(-2),note:"临界逾期，需重点跟进",followUps:[{date:d(-3),method:"电话",reply:"承诺三天内付款",next:d(0)}],createdAt:Date.now()-22*86400000},
+    ];
+  }
+
+  /* ---------- init ---------- */
+  load();
+  bindAutoCalc();
+  render();
+  window.addEventListener("keydown",e=>{ if(e.key==="Escape"){ closeEdit(); closeSet(); } });
+})();
+</script>
+</body>
+</html>
