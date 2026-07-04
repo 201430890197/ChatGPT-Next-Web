@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>混凝土应收账款催收管理</title>
+<title>混凝土应收账款 · 合同对账催收管理</title>
 <style>
   :root{
     --bg:#f4f6f9; --panel:#ffffff; --line:#e6e9ef; --text:#1f2733; --muted:#7a8699;
@@ -12,6 +12,7 @@
     --amber:#e8940c; --amber-bg:#fdf3e3;
     --green:#2f9e56; --green-bg:#e9f6ee;
     --gray:#8a94a6; --gray-bg:#eef1f5;
+    --blue:#2f6bff; --blue-bg:#eaf0ff;
     --shadow:0 1px 3px rgba(20,30,50,.08),0 6px 20px rgba(20,30,50,.06);
     --radius:12px;
   }
@@ -25,7 +26,7 @@
   input,select,textarea{font-family:inherit; font-size:14px}
 
   /* Layout */
-  .app{max-width:1280px; margin:0 auto; padding:18px 20px 60px}
+  .app{max-width:1320px; margin:0 auto; padding:18px 20px 60px}
   header.top{display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-bottom:16px}
   .logo{display:flex; align-items:center; gap:10px}
   .logo .mark{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--brand),#5b8bff);display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;box-shadow:var(--shadow)}
@@ -53,7 +54,6 @@
   .dot{width:8px;height:8px;border-radius:50%}
   .dot.red{background:var(--red)} .dot.amber{background:var(--amber)} .dot.green{background:var(--green)} .dot.blue{background:var(--brand)} .dot.gray{background:var(--gray)}
   .card.clickable{cursor:pointer} .card.clickable:hover{border-color:#c9d1de}
-  .card.active{outline:2px solid var(--brand); outline-offset:-1px}
 
   /* Toolbar */
   .toolbar{display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:14px}
@@ -65,11 +65,14 @@
   .search input:focus{border-color:var(--brand)}
   .search .ic{position:absolute; left:11px; top:50%; transform:translateY(-50%); color:var(--muted)}
   select.sort{padding:9px 12px; border:1px solid var(--line); border-radius:9px; background:var(--panel); outline:none}
+  .focuschip{display:none; align-items:center; gap:6px; padding:7px 12px; border-radius:9px; background:var(--blue-bg); color:var(--brand); font-size:12px; font-weight:700}
+  .focuschip.show{display:inline-flex}
+  .focuschip b{cursor:pointer}
 
   /* Table */
   .tablewrap{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); overflow-x:auto}
-  table{width:100%; border-collapse:collapse; min-width:940px}
-  th,td{text-align:left; padding:12px 14px; border-bottom:1px solid var(--line); vertical-align:middle}
+  table{width:100%; border-collapse:collapse; min-width:1040px}
+  th,td{text-align:left; padding:12px 14px; border-bottom:1px solid var(--line); vertical-align:top}
   th{font-size:12px; color:var(--muted); font-weight:600; background:#fafbfd; position:sticky; top:0; white-space:nowrap}
   tbody tr:hover{background:#fafbff}
   tbody tr:last-child td{border-bottom:none}
@@ -81,20 +84,26 @@
   .badge.amber{background:var(--amber-bg); color:var(--amber)}
   .badge.green{background:var(--green-bg); color:var(--green)}
   .badge.gray{background:var(--gray-bg); color:var(--gray)}
-  .rowtag{font-size:11px; color:var(--muted); margin-top:3px}
-  .prog{height:6px; background:#eef1f5; border-radius:4px; overflow:hidden; margin-top:5px; width:120px}
-  .prog > i{display:block; height:100%; background:var(--green)}
+  .badge.blue{background:var(--blue-bg); color:var(--brand)}
+  .chip{display:inline-flex; align-items:center; padding:2px 8px; border-radius:6px; font-size:11px; font-weight:700; margin:2px 4px 2px 0; white-space:nowrap; border:1px solid transparent}
+  .chip.red{background:var(--red-bg); color:var(--red)}
+  .chip.amber{background:var(--amber-bg); color:var(--amber)}
+  .chip.green{background:var(--green-bg); color:var(--green)}
+  .chip.gray{background:var(--gray-bg); color:var(--gray)}
+  .chip.blue{background:var(--blue-bg); color:var(--brand)}
+  .todos{display:flex; flex-wrap:wrap; gap:0; max-width:230px}
+  .amount-red{color:var(--red); font-weight:800}
+  .amount-q{color:var(--amber); font-weight:800}
   .empty{padding:60px 20px; text-align:center; color:var(--muted)}
   .empty .big{font-size:40px; margin-bottom:10px}
 
   /* Modal */
   .mask{position:fixed; inset:0; background:rgba(20,28,44,.42); display:none; align-items:flex-start; justify-content:center; padding:40px 16px; z-index:50; overflow-y:auto}
   .mask.show{display:flex}
-  .modal{background:var(--panel); width:100%; max-width:720px; border-radius:16px; box-shadow:0 20px 60px rgba(20,30,50,.3); overflow:hidden}
-  .modal.wide{max-width:820px}
+  .modal{background:var(--panel); width:100%; max-width:760px; border-radius:16px; box-shadow:0 20px 60px rgba(20,30,50,.3); overflow:hidden}
   .modal h2{margin:0; font-size:16px}
   .mhead{display:flex; align-items:center; justify-content:space-between; padding:18px 22px; border-bottom:1px solid var(--line)}
-  .mbody{padding:20px 22px; max-height:66vh; overflow-y:auto}
+  .mbody{padding:20px 22px; max-height:68vh; overflow-y:auto}
   .mfoot{display:flex; justify-content:flex-end; gap:10px; padding:16px 22px; border-top:1px solid var(--line); background:#fafbfd}
   .grid2{display:grid; grid-template-columns:1fr 1fr; gap:14px}
   .grid3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px}
@@ -104,6 +113,8 @@
   .field input,.field select,.field textarea{width:100%; padding:9px 11px; border:1px solid var(--line); border-radius:9px; outline:none; background:#fff}
   .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--brand)}
   .field textarea{resize:vertical; min-height:60px}
+  .check{display:flex; align-items:center; gap:8px; padding:9px 11px; border:1px solid var(--line); border-radius:9px; background:#fff; font-size:13px; font-weight:600}
+  .check input{width:auto}
   .hint{font-size:11px; color:var(--muted); margin-top:4px}
   .section-title{font-size:13px; font-weight:700; margin:18px 0 10px; padding-top:14px; border-top:1px dashed var(--line); display:flex; align-items:center; justify-content:space-between}
   .section-title:first-child{border-top:none; padding-top:0; margin-top:0}
@@ -116,11 +127,7 @@
   .fu .fu-reply{margin-top:6px; font-size:13px; color:var(--text)}
   .fu .fu-next{margin-top:6px; font-size:12px; color:var(--amber)}
   .fu-add{display:grid; grid-template-columns:130px 120px 1fr auto; gap:8px; align-items:start; margin-top:6px}
-  .kv{display:flex; gap:22px; flex-wrap:wrap; margin-bottom:6px; font-size:13px}
-  .kv b{font-weight:700}
-  .amount-red{color:var(--red); font-weight:800}
   .footer-note{text-align:center; color:var(--muted); font-size:12px; margin-top:26px; line-height:1.8}
-  .footer-note a{color:var(--brand); text-decoration:none}
 
   .toast{position:fixed; bottom:26px; left:50%; transform:translateX(-50%) translateY(20px); background:#1f2733; color:#fff; padding:11px 20px; border-radius:10px; font-size:13px; opacity:0; pointer-events:none; transition:.25s; z-index:100; box-shadow:0 8px 30px rgba(0,0,0,.25)}
   .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
@@ -138,16 +145,16 @@
     <div class="logo">
       <div class="mark">🏗️</div>
       <div>
-        <h1>混凝土应收账款催收管理</h1>
-        <div class="sub">轮动催收 · 逾期预警 · 台账管理</div>
+        <h1>混凝土应收账款 · 合同对账催收管理</h1>
+        <div class="sub">合同/对账/对账单回收 · 金额确认 · 催收待办</div>
       </div>
     </div>
     <div class="spacer"></div>
-    <button class="btn" id="btnSettings">⚙️ 预警设置</button>
+    <button class="btn" id="btnSettings">⚙️ 设置</button>
     <button class="btn" id="btnExport">导出</button>
     <button class="btn" id="btnImport">导入</button>
     <button class="btn" id="btnDaily">📋 每日对账</button>
-    <button class="btn primary" id="btnAdd">＋ 新增应收</button>
+    <button class="btn primary" id="btnAdd">＋ 新增项目</button>
   </header>
 
   <section class="stats" id="stats"></section>
@@ -155,18 +162,17 @@
   <div class="toolbar">
     <div class="tabs" id="tabs">
       <button class="tab active" data-tab="all">全部台账</button>
-      <button class="tab" data-tab="today">今日催收</button>
-      <button class="tab" data-tab="settled">已结清</button>
+      <button class="tab" data-tab="todo">待办清单</button>
+      <button class="tab" data-tab="done">已完结</button>
     </div>
     <div class="search">
       <span class="ic">🔍</span>
-      <input id="search" placeholder="搜索客户 / 合同号 / 工程名称…" />
+      <input id="search" placeholder="搜索客户 / 项目 / 对接人 / 备注…" />
     </div>
+    <span class="focuschip" id="focuschip"><span id="focusLabel"></span><b id="focusClear">✕ 清除筛选</b></span>
     <select class="sort" id="sort">
-      <option value="priority">按催收优先级</option>
-      <option value="remaining">按未收金额</option>
-      <option value="due">按到期日</option>
-      <option value="overdue">按逾期天数</option>
+      <option value="priority">按待办优先级</option>
+      <option value="remaining">按欠款金额</option>
       <option value="customer">按客户名称</option>
     </select>
   </div>
@@ -175,21 +181,19 @@
     <table>
       <thead>
         <tr>
-          <th style="width:20%">客户 / 工程</th>
-          <th style="width:15%">合同</th>
-          <th class="num">合同总额</th>
-          <th class="num">已收 / 未收</th>
-          <th style="width:13%">约定付款日</th>
-          <th style="width:14%">状态</th>
-          <th style="width:12%">最近催收</th>
-          <th style="width:90px"></th>
+          <th style="width:24%">客户 / 项目</th>
+          <th style="width:20%">合同 / 对账 / 单据</th>
+          <th class="num">欠款金额</th>
+          <th style="width:22%">下一步待办（卡点）</th>
+          <th style="width:12%">最近跟进</th>
+          <th style="width:80px"></th>
         </tr>
       </thead>
       <tbody id="rows"></tbody>
     </table>
     <div class="empty" id="empty" style="display:none">
       <div class="big">📭</div>
-      <div id="emptyText">暂无记录，点击右上角「＋ 新增应收」开始建立台账</div>
+      <div id="emptyText">暂无记录，点击右上角「＋ 新增项目」开始建立台账</div>
     </div>
   </div>
 
@@ -201,50 +205,73 @@
 
 <!-- 新增/编辑 弹窗 -->
 <div class="mask" id="editMask">
-  <div class="modal wide">
+  <div class="modal">
     <div class="mhead">
-      <h2 id="editTitle">新增应收账款</h2>
+      <h2 id="editTitle">新增项目</h2>
       <button class="btn ghost" id="editClose">✕</button>
     </div>
     <div class="mbody">
       <div class="section-title">基本信息</div>
       <div class="grid2">
-        <div class="field"><label>客户名称 <span class="req">*</span></label><input id="f_customer" placeholder="如：XX建筑工程有限公司" /></div>
-        <div class="field"><label>工程 / 项目名称</label><input id="f_project" placeholder="如：XX路桥梁工程" /></div>
+        <div class="field"><label>客户 / 单位名称 <span class="req">*</span></label><input id="f_customer" placeholder="如：湖南省衡州建设有限公司" /></div>
+        <div class="field"><label>工程 / 项目名称</label><input id="f_project" placeholder="如：城正街道内涝治理项目" /></div>
       </div>
       <div class="grid3">
-        <div class="field"><label>合同编号</label><input id="f_contract" placeholder="如：HT-2026-001" /></div>
-        <div class="field"><label>联系人 / 电话</label><input id="f_contact" placeholder="如：张经理 138…" /></div>
+        <div class="field"><label>业务对接人 / 电话</label><input id="f_contact" placeholder="如：龙兰兰 138…" /></div>
+        <div class="field"><label>供货周期</label><input id="f_supplyPeriod" placeholder="如：2026年1月至3月" /></div>
         <div class="field"><label>混凝土标号</label><input id="f_grade" placeholder="如：C30" /></div>
       </div>
 
-      <div class="section-title">金额核算</div>
+      <div class="section-title">合同 / 对账 / 单据状态</div>
       <div class="grid3">
-        <div class="field"><label>方量 (m³)</label><input id="f_qty" type="number" step="0.01" placeholder="如：1200" /></div>
-        <div class="field"><label>单价 (元/m³)</label><input id="f_price" type="number" step="0.01" placeholder="如：420" /></div>
-        <div class="field"><label>合同总额 (元) <span class="req">*</span></label><input id="f_amount" type="number" step="0.01" placeholder="方量×单价可自动填" /></div>
+        <div class="field"><label>合同状态</label>
+          <select id="f_contractStatus">
+            <option value="">— 未填 —</option>
+            <option>已归档</option><option>合同未归</option><option>无合同</option><option>需补充合同</option>
+          </select></div>
+        <div class="field"><label>对账状态</label>
+          <select id="f_reconStatus">
+            <option value="">— 未填 —</option>
+            <option>已对账</option><option>部分对账</option><option>未对账</option>
+          </select></div>
+        <div class="field"><label>对账单状态</label>
+          <select id="f_statementStatus">
+            <option value="">— 未填 —</option>
+            <option>已归档</option><option>对账单未归</option><option>对账单未签</option><option>已签存疑</option><option>无对账单</option>
+          </select></div>
       </div>
-      <div class="grid2">
+
+      <div class="section-title">金额</div>
+      <div class="grid3">
+        <div class="field"><label>方量 (m³)</label><input id="f_qty" type="number" step="0.01" placeholder="选填" /></div>
+        <div class="field"><label>单价 (元/m³)</label><input id="f_price" type="number" step="0.01" placeholder="选填" /></div>
+        <div class="field"><label>合同总额 (元)</label><input id="f_amount" type="number" step="0.01" placeholder="方量×单价可自动填；只知欠款可留空" /></div>
+      </div>
+      <div class="grid3">
         <div class="field"><label>已收金额 (元)</label><input id="f_received" type="number" step="0.01" placeholder="默认 0" /></div>
-        <div class="field"><label>未收余额</label><input id="f_remaining" disabled placeholder="自动计算" /></div>
+        <div class="field"><label>未收欠款</label><input id="f_remaining" disabled placeholder="自动计算" /></div>
+        <div class="field"><label>金额确认</label>
+          <label class="check"><input type="checkbox" id="f_amountConfirmed" /> <span>金额/单价已确认</span></label>
+          <div class="hint">未勾选＝待确认（如未定价、易货、暂按开票入账等）</div>
+        </div>
       </div>
 
       <div class="section-title">付款计划 / 账期</div>
       <div class="grid3">
         <div class="field"><label>供货 / 发货日期</label><input id="f_delivery" type="date" /></div>
         <div class="field"><label>账期 (天)</label><input id="f_term" type="number" placeholder="如：30" /><div class="hint">填发货日+账期可自动算到期日</div></div>
-        <div class="field"><label>约定付款日期</label><input id="f_due" type="date" /><div class="hint">不填则按「久未跟进」规则提醒</div></div>
+        <div class="field"><label>约定付款日期</label><input id="f_due" type="date" /></div>
       </div>
-      <div class="field"><label>备注</label><textarea id="f_note" placeholder="其他说明…"></textarea></div>
+      <div class="field"><label>备注 / 卡点说明</label><textarea id="f_note" placeholder="如：第二份补充合同已送未归，需签第三份补充合同…"></textarea></div>
 
-      <div class="section-title">催收记录 <button class="btn sm" id="fuAddBtn">＋ 新增一条催收</button></div>
+      <div class="section-title">催收 / 跟进记录 <button class="btn sm" id="fuAddBtn">＋ 新增一条</button></div>
       <div class="fu-add">
         <input id="fu_date" type="date" />
         <select id="fu_method"><option>电话</option><option>微信</option><option>短信</option><option>上门</option><option>函件</option><option>其他</option></select>
         <input id="fu_reply" placeholder="对方答复 / 情况说明" />
         <input id="fu_next" type="date" title="下次跟进日期" />
       </div>
-      <div class="hint" style="margin-bottom:10px">填写上方后点「＋ 新增一条催收」加入下方列表</div>
+      <div class="hint" style="margin-bottom:10px">填写上方后点「＋ 新增一条」加入下方列表</div>
       <div id="fuList"></div>
     </div>
     <div class="mfoot">
@@ -258,7 +285,7 @@
 <!-- 设置 弹窗 -->
 <div class="mask" id="setMask">
   <div class="modal">
-    <div class="mhead"><h2>预警规则设置</h2><button class="btn ghost" id="setClose">✕</button></div>
+    <div class="mhead"><h2>设置</h2><button class="btn ghost" id="setClose">✕</button></div>
     <div class="mbody">
       <div class="field">
         <label>「临近到期」提前天数</label>
@@ -282,7 +309,7 @@
 
 <!-- 每日对账导入 弹窗 -->
 <div class="mask" id="impMask">
-  <div class="modal wide">
+  <div class="modal">
     <div class="mhead"><h2>📋 每日对账导入（欠款明细表）</h2><button class="btn ghost" id="impClose">✕</button></div>
     <div class="mbody">
       <div class="hint" style="margin-bottom:8px; line-height:1.8">
@@ -290,8 +317,8 @@
         每行是「客户/项目名称 + 欠款金额」；名称和金额被拆成两行也能自动识别；表头、日期、合计行会自动跳过。
       </div>
       <textarea id="imp_text" style="width:100%; min-height:170px; padding:10px; border:1px solid var(--line); border-radius:9px; outline:none" placeholder="例如：
-宏图建筑工程有限公司滨江路桥梁工程  394,200.00
-通达房地产开发公司锦绣花园三期  1,008,000.00
+万通建设(体育公园)  89824.00
+晨辉建筑(建筑垃圾资源化处理中心)  4050.00
 （也支持名称一行、金额一行的格式）"></textarea>
       <div style="margin:10px 0"><button class="btn primary" id="impParse">解析预览</button> <span class="hint" id="impCount"></span></div>
       <div id="impPreview"></div>
@@ -309,7 +336,7 @@
 <script>
 "use strict";
 (function(){
-  const LS_DATA = "concrete_ar_records_v1";
+  const LS_DATA = "concrete_ar_records_v2";
   const LS_CFG  = "concrete_ar_config_v1";
   const $ = s => document.querySelector(s);
   const fmt = n => (Number(n)||0).toLocaleString("zh-CN",{maximumFractionDigits:2});
@@ -317,83 +344,117 @@
   const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
   const today = () => { const d=new Date(); d.setHours(0,0,0,0); return d; };
   const parseDate = s => { if(!s) return null; const d=new Date(s+"T00:00:00"); return isNaN(d)?null:d; };
-  const dayDiff = (a,b) => Math.round((a-b)/86400000); // a - b in days
+  const dayDiff = (a,b) => Math.round((a-b)/86400000);
 
   let cfg = { nearDays:7, staleDays:15 };
   let records = [];
-  let state = { tab:"all", search:"", sort:"priority", editingId:null, draftFollowUps:[] };
+  let state = { tab:"all", search:"", sort:"priority", focus:"", editingId:null, draftFollowUps:[] };
 
   /* ---------- storage ---------- */
   function load(){
     try{ const c=JSON.parse(localStorage.getItem(LS_CFG)); if(c) cfg={...cfg,...c}; }catch(e){}
     try{ const d=JSON.parse(localStorage.getItem(LS_DATA)); if(Array.isArray(d)) records=d; }catch(e){}
-    if(localStorage.getItem(LS_DATA)===null){ records = demoData(); save(); }
+    if(localStorage.getItem(LS_DATA)===null){ records = seedData(); save(); }
   }
   function save(){ localStorage.setItem(LS_DATA, JSON.stringify(records)); }
   function saveCfg(){ localStorage.setItem(LS_CFG, JSON.stringify(cfg)); }
 
-  /* ---------- status engine ---------- */
-  // returns {key, label, color, days, priority}
-  function evalStatus(r){
-    const remaining = (Number(r.amount)||0) - (Number(r.received)||0);
-    if(remaining <= 0.001){
-      return {key:"settled", label:"已结清", color:"gray", remaining, priority:-1};
-    }
-    const t = today();
-    const due = parseDate(r.due);
-    const lastFu = r.followUps && r.followUps.length ? parseDate(r.followUps[r.followUps.length-1].date) : null;
-    const staleDays = lastFu ? dayDiff(t,lastFu) : (r.createdAt ? dayDiff(t,new Date(r.createdAt)) : 999);
+  const remainOf = r => (Number(r.amount)||0) - (Number(r.received)||0);
 
-    if(due){
-      const od = dayDiff(t, due); // >0 overdue
-      if(od > 0){
-        // priority weighted by overdue days & amount
-        return {key:"overdue", label:`已逾期 ${od} 天`, color:"red", remaining,
-          priority: 1e12 + od*1e6 + remaining};
-      }
-      if(od >= -cfg.nearDays){
-        const left = -od;
-        return {key:"near", label: left===0?"今日到期":`${left} 天后到期`, color:"amber", remaining,
-          priority: 8e11 - left*1e6 + remaining};
+  /* ---------- 待办/卡点 引擎 ----------
+     每条记录算出一组“卡点”（待办事项），优先级高的排前面。
+     卡点分三类：amount(金额待确认) / docs(合同·对账·对账单) / pay(催款) */
+  function evalBlocks(r){
+    const blocks = [];
+    const rem = remainOf(r);
+    const t = today();
+
+    // 金额/单价待确认
+    if(r.amountConfirmed === false)
+      blocks.push({cat:"amount", label:"待确认金额/单价", color:"red", pr:95});
+
+    // 逾期催款（单据即便没齐，逾期也要催）
+    let payHandled = false;
+    if(rem > 0.005){
+      const due = parseDate(r.due);
+      if(due){
+        const od = dayDiff(t, due);
+        if(od > 0){ blocks.push({cat:"pay", label:`逾期${od}天·催款`, color:"red", pr:90}); payHandled=true; }
+        else if(od >= -cfg.nearDays){ blocks.push({cat:"pay", label:(od===0?"今日到期·催款":`${-od}天后到期·备催`), color:"amber", pr:45}); payHandled=true; }
       }
     }
-    if(staleDays > cfg.staleDays){
-      return {key:"stale", label:`久未跟进 ${staleDays} 天`, color:"amber", remaining,
-        priority: 5e11 + staleDays*1e6 + remaining};
+
+    // 对账
+    if(r.reconStatus==="未对账") blocks.push({cat:"docs", label:"待对账", color:"red", pr:80});
+    else if(r.reconStatus==="部分对账") blocks.push({cat:"docs", label:"对账未完成", color:"amber", pr:70});
+
+    // 对账单
+    const stmtMap = {"无对账单":"待出对账单","对账单未签":"催对账单签字","已签存疑":"核实对账单效力","对账单未归":"催回对账单"};
+    if(stmtMap[r.statementStatus]) blocks.push({cat:"docs", label:stmtMap[r.statementStatus], color:"amber", pr:60});
+
+    // 合同
+    if(r.contractStatus==="需补充合同") blocks.push({cat:"docs", label:"签补充合同(超方)", color:"amber", pr:58});
+    else if(r.contractStatus==="无合同") blocks.push({cat:"docs", label:"待签合同", color:"amber", pr:50});
+    else if(r.contractStatus==="合同未归") blocks.push({cat:"docs", label:"催回合同", color:"amber", pr:50});
+
+    // 催款（未逾期时的兜底）
+    if(rem > 0.005 && !payHandled){
+      const lastFu = r.followUps && r.followUps.length ? parseDate(r.followUps[r.followUps.length-1].date) : null;
+      const staleDays = lastFu ? dayDiff(t,lastFu) : (r.createdAt ? dayDiff(t,new Date(r.createdAt)) : 999);
+      if(staleDays > cfg.staleDays) blocks.push({cat:"pay", label:`久未跟进${staleDays}天`, color:"amber", pr:42});
+      else blocks.push({cat:"pay", label:"待收款", color:"blue", pr:20});
     }
-    return {key:"normal", label:"正常", color:"green", remaining, priority: remaining};
+
+    blocks.sort((a,b)=>b.pr-a.pr);
+    return blocks;
+  }
+
+  // 完结：钱已收清 且 金额已确认 且 无单据卡点
+  function isDone(r){
+    const blocks = evalBlocks(r);
+    return remainOf(r) <= 0.005 && r.amountConfirmed !== false && !blocks.some(b=>b.cat!=="pay");
+  }
+
+  /* ---------- 单据状态小标签 ---------- */
+  const stColor = {
+    "无合同":"red","合同未归":"amber","需补充合同":"amber","已归档":"green",
+    "未对账":"red","部分对账":"amber","已对账":"green",
+    "无对账单":"red","对账单未归":"amber","对账单未签":"amber","已签存疑":"amber",
+  };
+  function statusChips(r){
+    const items = [["合同",r.contractStatus],["对账",r.reconStatus],["单据",r.statementStatus]].filter(x=>x[1]);
+    if(!items.length) return '<span class="meta">—</span>';
+    return items.map(([k,v])=>`<span class="chip ${stColor[v]||'gray'}">${k}·${esc(v)}</span>`).join("");
   }
 
   /* ---------- rendering ---------- */
-  function computeRows(){
-    return records.map(r => ({r, st:evalStatus(r)}));
-  }
   function renderStats(){
-    const all = computeRows();
-    const active = all.filter(x=>x.st.key!=="settled");
-    const totalReceivable = active.reduce((s,x)=>s+x.st.remaining,0);
-    const overdue = active.filter(x=>x.st.key==="overdue");
-    const overdueAmt = overdue.reduce((s,x)=>s+x.st.remaining,0);
-    const urgent = active.filter(x=>x.st.color==="red"||x.st.color==="amber");
-    const settledCount = all.length - active.length;
+    const active = records.filter(r=>!isDone(r));
+    const totalRem = active.reduce((s,r)=>s+Math.max(0,remainOf(r)),0);
+    const unconfirmed = active.filter(r=>r.amountConfirmed===false);
+    const docPending = active.filter(r=>evalBlocks(r).some(b=>b.cat==="docs"));
+    const overdue = active.filter(r=>evalBlocks(r).some(b=>b.cat==="pay"&&b.color==="red"));
+    const overdueAmt = overdue.reduce((s,r)=>s+Math.max(0,remainOf(r)),0);
+    const doneCount = records.length - active.length;
     const stats = [
-      {label:"应收总额", dot:"blue", value:money(totalReceivable), sub:`${active.length} 笔未结清`, tab:null},
-      {label:"已逾期(紧急)", dot:"red", value:money(overdueAmt), sub:`${overdue.length} 笔需催款`, tab:"overdue"},
-      {label:"待跟进提醒", dot:"amber", value:urgent.length-overdue.length+" 笔", sub:"临近/久未跟进", tab:"todo"},
-      {label:"今日催收清单", dot:"amber", value:urgent.length+" 笔", sub:"点击查看轮动清单", tab:"today"},
-      {label:"已结清", dot:"green", value:settledCount+" 笔", sub:"已全额收款", tab:"settled"},
+      {label:"应收欠款合计", dot:"blue",  value:money(totalRem),          sub:`${active.length} 个项目未结`, focus:""},
+      {label:"待确认金额",   dot:"red",   value:unconfirmed.length+" 个", sub:"单价/金额未定", focus:"amount"},
+      {label:"单据待办",     dot:"amber", value:docPending.length+" 个",  sub:"合同/对账/对账单", focus:"docs"},
+      {label:"逾期催款",     dot:"red",   value:money(overdueAmt),        sub:`${overdue.length} 个已逾期`, focus:"pay"},
+      {label:"已完结",       dot:"green", value:doneCount+" 个",          sub:"钱收清·单据齐", focus:"done"},
     ];
-    $("#stats").innerHTML = stats.map((s,i)=>`
-      <div class="card clickable" data-jump="${s.tab||""}">
+    $("#stats").innerHTML = stats.map(s=>`
+      <div class="card clickable" data-focus="${s.focus}">
         <div class="label"><span class="dot ${s.dot}"></span>${s.label}</div>
         <div class="value">${s.value}</div>
         <div class="meta">${s.sub}</div>
       </div>`).join("");
     document.querySelectorAll("#stats .card").forEach(c=>{
-      c.onclick=()=>{ const j=c.getAttribute("data-jump");
-        if(j==="today"||j==="settled"){ switchTab(j); }
-        else if(j==="overdue"){ switchTab("all"); state.sort="overdue"; $("#sort").value="overdue"; render(); }
-        else if(j==="todo"){ switchTab("today"); }
+      c.onclick=()=>{
+        const f=c.getAttribute("data-focus");
+        if(f==="done"){ state.focus=""; switchTab("done"); return; }
+        state.focus=f||"";
+        switchTab("todo");
       };
     });
   }
@@ -401,63 +462,68 @@
   function matchSearch(r){
     const q = state.search.trim().toLowerCase();
     if(!q) return true;
-    return [r.customer,r.project,r.contract,r.contact,r.grade].some(v=>(v||"").toLowerCase().includes(q));
+    return [r.customer,r.project,r.contact,r.supplyPeriod,r.grade,r.note].some(v=>(v||"").toLowerCase().includes(q));
   }
 
+  const focusLabels = {amount:"仅看：待确认金额", docs:"仅看：单据待办", pay:"仅看：催款/逾期"};
   function currentList(){
-    let list = computeRows().filter(x=>matchSearch(x.r));
-    if(state.tab==="settled") list = list.filter(x=>x.st.key==="settled");
-    else if(state.tab==="today") list = list.filter(x=>x.st.color==="red"||x.st.color==="amber");
-    else list = list.filter(x=>x.st.key!=="settled");
+    let list = records.filter(matchSearch);
+    if(state.tab==="done") list = list.filter(isDone);
+    else if(state.tab==="todo"){
+      list = list.filter(r=>!isDone(r) && evalBlocks(r).length);
+      if(state.focus) list = list.filter(r=>evalBlocks(r).some(b=>b.cat===state.focus));
+    } else list = list.filter(r=>!isDone(r));
 
+    const rows = list.map(r=>({r, blocks:evalBlocks(r), rem:remainOf(r)}));
     const s = state.sort;
-    list.sort((a,b)=>{
-      if(s==="priority") return b.st.priority - a.st.priority;
-      if(s==="remaining") return b.st.remaining - a.st.remaining;
-      if(s==="overdue"){ const oa=a.st.key==="overdue"?a.st.priority:0, ob=b.st.key==="overdue"?b.st.priority:0; return ob-oa; }
+    rows.sort((a,b)=>{
+      if(s==="remaining") return b.rem - a.rem;
       if(s==="customer") return (a.r.customer||"").localeCompare(b.r.customer||"","zh");
-      if(s==="due"){ const da=parseDate(a.r.due)||new Date(8640000000000000), db=parseDate(b.r.due)||new Date(8640000000000000); return da-db; }
-      return 0;
+      const pa = (a.blocks[0]?a.blocks[0].pr:0)*1e7 + Math.min(Math.max(0,a.rem),1e7);
+      const pb = (b.blocks[0]?b.blocks[0].pr:0)*1e7 + Math.min(Math.max(0,b.rem),1e7);
+      return pb - pa;
     });
-    return list;
+    return rows;
   }
 
   function render(){
     renderStats();
+    // focus chip 只在待办页显示
+    const fc = $("#focuschip");
+    if(state.tab==="todo" && state.focus && focusLabels[state.focus]){
+      $("#focusLabel").textContent = focusLabels[state.focus]; fc.classList.add("show");
+    } else fc.classList.remove("show");
+
     const list = currentList();
     const tbody = $("#rows");
     if(!list.length){
       tbody.innerHTML=""; $("#empty").style.display="block";
       $("#emptyText").textContent = state.search ? "没有匹配的记录" :
-        (state.tab==="today" ? "🎉 今日没有需要催收的账款" :
-         state.tab==="settled" ? "还没有已结清的账款" :
-         "暂无记录，点击右上角「＋ 新增应收」开始建立台账");
+        (state.tab==="todo" ? "🎉 当前没有待办卡点" :
+         state.tab==="done" ? "还没有已完结的项目" :
+         "暂无记录，点击右上角「＋ 新增项目」开始建立台账");
       return;
     }
     $("#empty").style.display="none";
-    tbody.innerHTML = list.map(({r,st})=>{
-      const remaining = st.remaining;
-      const pct = r.amount>0 ? Math.min(100,Math.round((Number(r.received)||0)/r.amount*100)) : 0;
+    tbody.innerHTML = list.map(({r,blocks,rem})=>{
       const lastFu = r.followUps && r.followUps.length ? r.followUps[r.followUps.length-1] : null;
-      const dueTxt = r.due ? r.due : "—";
+      const amtCls = r.amountConfirmed===false ? "amount-q" : (rem>0?"amount-red":"");
+      const amtTxt = (Number(r.amount)||0)===0 && r.amountConfirmed===false ? "待定" :
+                     money(rem) + (r.amountConfirmed===false ? " ?" : "");
+      const todoHtml = blocks.length
+        ? `<div class="todos">${blocks.map(b=>`<span class="chip ${b.color}">${esc(b.label)}</span>`).join("")}</div>`
+        : '<span class="badge green">✓ 已完结</span>';
+      const sub = [r.project, r.supplyPeriod].filter(Boolean).map(esc).join(" · ");
       return `<tr data-id="${r.id}">
         <td>
-          <div class="cust">${esc(r.customer||"未命名客户")}</div>
-          <div class="meta">${esc(r.project||"")}${r.grade?" · "+esc(r.grade):""}</div>
+          <div class="cust">${esc(r.customer||"未命名")}</div>
+          ${sub?`<div class="meta">${sub}</div>`:""}
+          ${r.contact?`<div class="meta">👤 ${esc(r.contact)}</div>`:""}
         </td>
-        <td>
-          <div>${esc(r.contract||"—")}</div>
-          <div class="meta">${r.qty?fmt(r.qty)+"m³":""}${r.qty&&r.price?" × ":""}${r.price?"¥"+fmt(r.price):""}</div>
-        </td>
-        <td class="num">${money(r.amount)}</td>
-        <td class="num">
-          <div style="color:var(--green)">${money(r.received)}</div>
-          <div class="${remaining>0?'amount-red':''}">${money(remaining)}</div>
-          <div class="prog"><i style="width:${pct}%;background:${pct>=100?'var(--green)':'var(--brand)'}"></i></div>
-        </td>
-        <td>${dueTxt}${r.term?`<div class="meta">账期 ${r.term} 天</div>`:""}</td>
-        <td><span class="badge ${st.color}"><span class="dot ${st.color}"></span>${st.label}</span></td>
-        <td>${lastFu?`<div>${lastFu.date}</div><div class="meta">${esc(lastFu.method||"")}</div>`:'<span class="meta">未催收</span>'}</td>
+        <td>${statusChips(r)}</td>
+        <td class="num"><span class="${amtCls}">${amtTxt}</span>${(Number(r.received)||0)>0?`<div class="meta">已收 ${money(r.received)}</div>`:""}</td>
+        <td>${todoHtml}</td>
+        <td>${lastFu?`<div>${lastFu.date}</div><div class="meta">${esc(lastFu.method||"")}</div>`:'<span class="meta">未跟进</span>'}</td>
         <td><button class="btn sm" data-edit="${r.id}">查看/编辑</button></td>
       </tr>`;
     }).join("");
@@ -468,12 +534,14 @@
   /* ---------- tabs / toolbar ---------- */
   function switchTab(t){
     state.tab=t;
+    if(t!=="todo") state.focus="";
     document.querySelectorAll(".tab").forEach(el=>el.classList.toggle("active", el.getAttribute("data-tab")===t));
     render();
   }
   $("#tabs").onclick = e => { const t=e.target.getAttribute("data-tab"); if(t) switchTab(t); };
   $("#search").oninput = e => { state.search=e.target.value; render(); };
   $("#sort").onchange = e => { state.sort=e.target.value; render(); };
+  $("#focusClear").onclick = ()=>{ state.focus=""; render(); };
 
   /* ---------- edit modal ---------- */
   function bindAutoCalc(){
@@ -501,11 +569,13 @@
     const r = id ? records.find(x=>x.id===id) : null;
     state.editingId = id || null;
     state.draftFollowUps = r && r.followUps ? JSON.parse(JSON.stringify(r.followUps)) : [];
-    $("#editTitle").textContent = r ? "编辑应收账款" : "新增应收账款";
+    $("#editTitle").textContent = r ? "编辑项目" : "新增项目";
     $("#editDelete").style.display = r ? "inline-block" : "none";
     const g=(k,v="")=> $("#f_"+k).value = (r&&r[k]!=null)?r[k]:v;
-    g("customer");g("project");g("contract");g("contact");g("grade");
+    g("customer");g("project");g("contact");g("supplyPeriod");g("grade");
+    g("contractStatus");g("reconStatus");g("statementStatus");
     g("qty");g("price");g("amount");g("received");g("delivery");g("term");g("due");g("note");
+    $("#f_amountConfirmed").checked = r ? r.amountConfirmed!==false : true;
     $("#f_amount").dataset.touched = r&&r.amount ? "1":"";
     $("#f_due").dataset.touched = r&&r.due ? "1":"";
     $("#f_remaining").value = fmt(((r&&r.amount)||0)-((r&&r.received)||0));
@@ -516,7 +586,7 @@
   }
   function renderDraftFu(){
     const el=$("#fuList");
-    if(!state.draftFollowUps.length){ el.innerHTML='<div class="hint">暂无催收记录</div>'; return; }
+    if(!state.draftFollowUps.length){ el.innerHTML='<div class="hint">暂无跟进记录</div>'; return; }
     el.innerHTML = state.draftFollowUps.map((f,i)=>`
       <div class="fu">
         <div class="fu-top">
@@ -529,7 +599,7 @@
     el.querySelectorAll("[data-del-fu]").forEach(b=> b.onclick=()=>{ state.draftFollowUps.splice(+b.getAttribute("data-del-fu"),1); renderDraftFu(); });
   }
   $("#fuAddBtn").onclick = ()=>{
-    const date=$("#fu_date").value; if(!date){ toast("请选择催收日期"); return; }
+    const date=$("#fu_date").value; if(!date){ toast("请选择跟进日期"); return; }
     state.draftFollowUps.push({date, method:$("#fu_method").value, reply:$("#fu_reply").value.trim(), next:$("#fu_next").value});
     state.draftFollowUps.sort((a,b)=> (a.date<b.date?-1:1));
     $("#fu_reply").value=""; $("#fu_next").value="";
@@ -541,20 +611,22 @@
 
   $("#editSave").onclick = ()=>{
     const customer=$("#f_customer").value.trim();
-    const amount=parseFloat($("#f_amount").value);
-    const due=$("#f_due").value;
-    if(!customer){ toast("请填写客户名称"); return; }
-    if(isNaN(amount)||amount<=0){ toast("请填写合同总额"); return; }
+    if(!customer){ toast("请填写客户 / 单位名称"); return; }
+    const prev = state.editingId ? records.find(x=>x.id===state.editingId) : null;
     const rec = {
       id: state.editingId || uid(),
-      customer, project:$("#f_project").value.trim(), contract:$("#f_contract").value.trim(),
-      contact:$("#f_contact").value.trim(), grade:$("#f_grade").value.trim(),
+      customer, project:$("#f_project").value.trim(),
+      contact:$("#f_contact").value.trim(), supplyPeriod:$("#f_supplyPeriod").value.trim(),
+      grade:$("#f_grade").value.trim(),
+      contractStatus:$("#f_contractStatus").value, reconStatus:$("#f_reconStatus").value,
+      statementStatus:$("#f_statementStatus").value,
       qty:num($("#f_qty").value), price:num($("#f_price").value),
-      amount, received:num($("#f_received").value)||0,
-      delivery:$("#f_delivery").value, term:num($("#f_term").value), due,
+      amount:num($("#f_amount").value)||0, received:num($("#f_received").value)||0,
+      amountConfirmed:$("#f_amountConfirmed").checked,
+      delivery:$("#f_delivery").value, term:num($("#f_term").value), due:$("#f_due").value,
       note:$("#f_note").value.trim(),
       followUps: state.draftFollowUps,
-      createdAt: state.editingId ? (records.find(x=>x.id===state.editingId)||{}).createdAt || Date.now() : Date.now(),
+      createdAt: prev ? prev.createdAt || Date.now() : Date.now(),
       updatedAt: Date.now(),
     };
     if(state.editingId){ const i=records.findIndex(x=>x.id===state.editingId); records[i]=rec; }
@@ -563,7 +635,7 @@
   };
   $("#editDelete").onclick = ()=>{
     if(!state.editingId) return;
-    if(!confirm("确定删除该客户的这笔应收记录？此操作不可恢复。")) return;
+    if(!confirm("确定删除这条记录？此操作不可恢复。")) return;
     records = records.filter(x=>x.id!==state.editingId);
     save(); closeEdit(); render(); toast("已删除");
   };
@@ -582,7 +654,7 @@
     saveCfg(); closeSet(); render(); toast("设置已保存");
   };
   $("#clearAll").onclick = ()=>{
-    if(!confirm("将清空全部应收账款数据，且不可恢复。建议先导出备份。确定清空？")) return;
+    if(!confirm("将清空全部数据，且不可恢复。建议先导出备份。确定清空？")) return;
     records=[]; save(); closeSet(); render(); toast("已清空全部数据");
   };
 
@@ -590,7 +662,6 @@
   const normName = s => String(s||"").replace(/\s+/g,"").replace(/（/g,"(").replace(/）/g,")");
   let impPlan = null;
 
-  // 解析粘贴文本：每行「名称 + 金额」，或名称与金额分成两行（微信提取文字常见）
   function parseImport(txt){
     const lines = txt.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
     const items = [];
@@ -609,27 +680,24 @@
     for(const raw of lines){
       const line = raw.replace(/[|｜\t]+/g," ").trim();
       if(isSkip(line)){ pendName=""; continue; }
-      // 整行只是一个金额（名称在上一行）
       const numOnly = line.match(/^(-?[\d,，]+(?:\.\d{1,2})?)$/);
       if(numOnly){
         if(pendName){ pushItem(pendName, numOnly[1]); pendName=""; }
         continue;
       }
-      // 行尾金额：要求带千分位逗号或小数点，避免把名称里的数字当金额
       const tail = line.match(/^(.*?)[\s:：]+(-?(?:[\d]{1,3}(?:[,，][\d]{3})+(?:\.\d{1,2})?|\d+\.\d{1,2}))$/)
                || line.match(/^(.+?)(-?(?:[\d]{1,3}(?:[,，][\d]{3})+(?:\.\d{1,2})?|\d+\.\d{1,2}))$/);
       if(tail && tail[1].trim()){
         pushItem((pendName + tail[1]).trim(), tail[2]);
         pendName = "";
       } else {
-        pendName += line; // 名称被拆行，与下一行拼接
+        pendName += line;
       }
     }
     return items;
   }
 
   function buildPlan(items){
-    // 同名合并（同一客户出现多行则金额相加）
     const byName = new Map();
     items.forEach(it=>{
       const k = normName(it.name);
@@ -641,7 +709,7 @@
       const rec = records.find(r => normName(r.customer)===k || normName((r.customer||"")+(r.project||""))===k);
       if(rec){
         seen.add(rec.id);
-        const oldRem = (Number(rec.amount)||0) - (Number(rec.received)||0);
+        const oldRem = remainOf(rec);
         const diff = it.amount - oldRem;
         if(Math.abs(diff) < 0.005) plan.push({type:"same",   name:it.name, rec, newRem:it.amount, diff:0});
         else if(diff > 0)          plan.push({type:"supply", name:it.name, rec, newRem:it.amount, diff});
@@ -650,10 +718,7 @@
         plan.push({type:"new", name:it.name, newRem:it.amount});
       }
     });
-    const missing = records.filter(r=>{
-      const rem = (Number(r.amount)||0)-(Number(r.received)||0);
-      return rem > 0.005 && !seen.has(r.id);
-    });
+    const missing = records.filter(r=> remainOf(r) > 0.005 && !seen.has(r.id));
     return {plan, missing};
   }
 
@@ -667,7 +732,7 @@
     const {plan, missing} = impPlan;
     const cnt = t => plan.filter(p=>p.type===t).length;
     const sum = plan.reduce((s,p)=>s+p.newRem,0);
-    let html = `<div class="kv" style="margin-bottom:10px">
+    let html = `<div class="kv" style="margin-bottom:10px; display:flex; gap:12px; flex-wrap:wrap; align-items:center; font-size:13px">
       <span>共 <b>${plan.length}</b> 条 · 表内欠款合计 <b>${money(sum)}</b></span>
       <span class="badge amber">新增 ${cnt("new")}</span>
       <span class="badge red">供货增加 ${cnt("supply")}</span>
@@ -686,12 +751,10 @@
       }).join("");
       html += `</tbody></table></div>`;
     }
-    if(plan.some(p=>p.type==="same")){
+    if(plan.some(p=>p.type==="same"))
       html += `<div class="hint" style="margin-top:8px">另有 ${cnt("same")} 条与台账一致，无需变动。</div>`;
-    }
-    if(missing.length){
+    if(missing.length)
       html += `<div class="hint" style="margin-top:8px; color:var(--amber)">⚠️ 台账中还有 ${missing.length} 个欠款客户未出现在本次表格中：${missing.slice(0,8).map(r=>esc(r.customer)).join("、")}${missing.length>8?" 等":""}。可能已结清或表格不全，导入不会改动它们，请自行核对。</div>`;
-    }
     $("#impPreview").innerHTML = html;
   }
 
@@ -715,22 +778,17 @@
 
   $("#impApply").onclick = ()=>{
     if(!impPlan) return;
-    const now = Date.now();
-    const ds = dateStr();
+    const now = Date.now(); const ds = dateStr();
     let nNew=0, nUpd=0;
     impPlan.plan.forEach(p=>{
       if(p.type==="new"){
-        records.push({ id:uid(), customer:p.name, project:"", contract:"", contact:"", grade:"",
-          qty:"", price:"", amount:p.newRem, received:0, delivery:"", term:"", due:"",
-          note:`${ds} 每日对账导入`, followUps:[], createdAt:now, updatedAt:now });
+        records.push({ id:uid(), customer:p.name, project:"", contact:"", supplyPeriod:"", grade:"",
+          contractStatus:"", reconStatus:"", statementStatus:"",
+          qty:"", price:"", amount:p.newRem, received:0, amountConfirmed:true,
+          delivery:"", term:"", due:"", note:`${ds} 每日对账导入`, followUps:[], createdAt:now, updatedAt:now });
         nNew++;
-      } else if(p.type==="supply"){
-        p.rec.amount = (Number(p.rec.amount)||0) + p.diff;
-        p.rec.updatedAt = now; nUpd++;
-      } else if(p.type==="paid"){
-        p.rec.received = (Number(p.rec.received)||0) + (-p.diff);
-        p.rec.updatedAt = now; nUpd++;
-      }
+      } else if(p.type==="supply"){ p.rec.amount = (Number(p.rec.amount)||0) + p.diff; p.rec.updatedAt = now; nUpd++; }
+      else if(p.type==="paid"){ p.rec.received = (Number(p.rec.received)||0) + (-p.diff); p.rec.updatedAt = now; nUpd++; }
     });
     save(); closeImp(); render();
     toast(`对账完成：新增 ${nNew} 条，更新 ${nUpd} 条`);
@@ -747,11 +805,14 @@
     toast("已导出 JSON 备份");
   }
   function exportCSV(){
-    const head=["客户","工程","合同号","标号","方量","单价","合同总额","已收","未收","约定付款日","账期","状态","最近催收日","备注"];
+    const head=["客户","项目","业务对接人","供货周期","合同状态","对账状态","对账单状态","金额确认","合同总额","已收","欠款","约定付款日","下一步待办","最近跟进","备注"];
     const lines=[head.join(",")];
-    computeRows().forEach(({r,st})=>{
+    records.forEach(r=>{
+      const blocks = evalBlocks(r);
+      const todo = isDone(r) ? "已完结" : blocks.map(b=>b.label).join(" / ");
       const lastFu = r.followUps&&r.followUps.length?r.followUps[r.followUps.length-1].date:"";
-      const row=[r.customer,r.project,r.contract,r.grade,r.qty,r.price,r.amount,r.received,st.remaining,r.due,r.term,st.label,lastFu,r.note]
+      const row=[r.customer,r.project,r.contact,r.supplyPeriod,r.contractStatus,r.reconStatus,r.statementStatus,
+        r.amountConfirmed===false?"待确认":"已确认",r.amount,r.received,remainOf(r),r.due,todo,lastFu,r.note]
         .map(v=>`"${String(v==null?"":v).replace(/"/g,'""')}"`);
       lines.push(row.join(","));
     });
@@ -785,15 +846,47 @@
   let toastTimer;
   function toast(msg){ const t=$("#toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove("show"),2200); }
 
-  /* ---------- demo data ---------- */
-  function demoData(){
-    const d=(off)=>{ const x=new Date(); x.setDate(x.getDate()+off); return x.toISOString().slice(0,10); };
+  /* ---------- 初始数据（由「各项目合同、对账情况梳理」整理，可在设置里清空） ---------- */
+  function seedData(){
+    const now = Date.now();
+    const mk = o => Object.assign({
+      id:uid(), customer:"", project:"", contact:"", supplyPeriod:"", grade:"",
+      contractStatus:"", reconStatus:"", statementStatus:"",
+      qty:"", price:"", amount:0, received:0, amountConfirmed:true,
+      delivery:"", term:"", due:"", note:"", followUps:[], createdAt:now, updatedAt:now
+    }, o);
     return [
-      {id:uid(),customer:"宏图建筑工程有限公司",project:"滨江路桥梁工程",contract:"HT-2026-018",contact:"张经理 138****2211",grade:"C40",qty:1560,price:445,amount:694200,received:300000,delivery:d(-60),term:30,due:d(-25),note:"二期款一直拖延",followUps:[{date:d(-20),method:"电话",reply:"称资金紧张，月底前付一部分",next:d(-5)},{date:d(-6),method:"上门",reply:"财务出差，下周处理",next:d(2)}],createdAt:Date.now()-60*86400000},
-      {id:uid(),customer:"通达房地产开发公司",project:"锦绣花园三期",contract:"HT-2026-025",contact:"李工 139****7788",grade:"C30",qty:2400,price:420,amount:1008000,received:0,delivery:d(-40),term:45,due:d(3),note:"",followUps:[{date:d(-8),method:"微信",reply:"确认到期按合同付款",next:d(3)}],createdAt:Date.now()-40*86400000},
-      {id:uid(),customer:"中建八局项目部",project:"高新区厂房",contract:"HT-2026-031",contact:"王主管 137****5566",grade:"C35",qty:980,price:435,amount:426300,received:426300,delivery:d(-50),term:30,due:d(-18),note:"已全额结清",followUps:[{date:d(-19),method:"电话",reply:"已安排付款",next:""}],createdAt:Date.now()-50*86400000},
-      {id:uid(),customer:"永盛市政工程队",project:"人民路改造",contract:"HT-2026-040",contact:"赵队 135****9900",grade:"C25",qty:620,price:398,amount:246760,received:100000,delivery:d(-30),term:60,due:d(30),note:"账期较长",followUps:[],createdAt:Date.now()-30*86400000},
-      {id:uid(),customer:"锦程物流仓储公司",project:"仓储中心地坪",contract:"HT-2026-044",contact:"孙经理 136****3344",grade:"C30",qty:1100,price:410,amount:451000,received:150000,delivery:d(-22),term:20,due:d(-2),note:"临界逾期，需重点跟进",followUps:[{date:d(-3),method:"电话",reply:"承诺三天内付款",next:d(0)}],createdAt:Date.now()-22*86400000},
+      mk({customer:"万通建设", project:"体育公园项目", supplyPeriod:"2024年12月至2025年6月", reconStatus:"已对账", statementStatus:"已归档", contractStatus:"合同未归", amount:89824, amountConfirmed:true, note:"已对账有对账单。已做付款申请3次，应归合同3份，现已归2份。剩余应付89824元。"}),
+      mk({customer:"湖南省衡州建设有限公司", project:"城正街道内涝治理项目", contractStatus:"合同未归", note:"晨辉居间费协议已盖章送对方未归；《商品混凝土采购合同》主体变更补充协议（分公司签订，2026年1月送）未归。"}),
+      mk({customer:"湖南省衡州建设有限公司(分公司)", project:"窑湾消防站项目", supplyPeriod:"2026年1-2月", reconStatus:"未对账", contractStatus:"需补充合同", note:"已送第二份补充合同未归。合同总量共2149.36方，截止2026年2月已供2471方，已超方，需签第三份补充合同（对接人需落实跟进）。"}),
+      mk({customer:"衡洲建设", project:"果沙片区排水防涝改造工程", contact:"龙兰兰", supplyPeriod:"2026年1-3月", reconStatus:"未对账", note:"业务对接人龙兰兰。"}),
+      mk({customer:"衡洲建设", project:"果沙片区·谢建敏泵车费用", contact:"谢建敏", statementStatus:"无对账单", amountConfirmed:false, note:"无泵车小票，供送后一直未提供，工地无法结算。"}),
+      mk({customer:"晨辉怡居养老中心", project:"", contact:"龙兰兰", reconStatus:"已对账", statementStatus:"对账单未归", note:"对账单2025年9月未归。"}),
+      mk({customer:"晨辉建筑工程(集团)有限公司", project:"湘潭市雨湖区城乡投建筑垃圾资源化处理中心", contact:"龙兰兰", supplyPeriod:"2025年7月", reconStatus:"已对账", statementStatus:"已归档", contractStatus:"无合同", amount:4050, amountConfirmed:true, note:"有对账单无合同。"}),
+      mk({customer:"湖南君科建设工程有限公司", project:"湘锰国有独立工矿棚改红片区改造及配套设施项目", contact:"刘呐", supplyPeriod:"2026年1月", statementStatus:"对账单未归", note:"对账单未归。"}),
+      mk({customer:"宁波奥强建设工程有限公司", project:"年产200万套汽车门窗防撞梁及装饰件生产项目二期", contact:"刘呐", supplyPeriod:"2025年11月", statementStatus:"对账单未归", note:"对账单未归。"}),
+      mk({customer:"湖南省超高压电力建设股份有限公司", project:"鹤岭500kV变电站主变更换工程", contact:"刘呐", supplyPeriod:"2025年12月至2026年3月", reconStatus:"未对账", statementStatus:"无对账单", contractStatus:"无合同", amount:54324, amountConfirmed:false, note:"开票数量与实际数量都未签对账单，暂按开票实际方量金额入账，待确认对账金额。"}),
+      mk({customer:"自来水厂宿舍", project:"", supplyPeriod:"2025年5月27日起", reconStatus:"已对账", statementStatus:"已归档", contractStatus:"合同未归", note:"合同未归，有对账单。"}),
+      mk({customer:"湖南错畅建设工程有限公司湘潭分公司", project:"窑湾街道龙子巷社区卫文街片区", supplyPeriod:"2025年5、6、7、8月", reconStatus:"未对账", contractStatus:"合同未归", note:"合同已走流程未归。"}),
+      mk({customer:"双旺建设工程有限公司", project:"雨湖区老旧小区改造(昭潭街道沙子岭社区)", contractStatus:"已归档", statementStatus:"已签存疑", amount:26542, amountConfirmed:true, note:"已签订合同，对账单王蔚兴签字（待核实）。未付款金额26542。"}),
+      mk({customer:"汇科建设", project:"雨湖区老旧小区改造(鹤岭镇红社区白冲片区)", supplyPeriod:"2025年6、7月", contractStatus:"无合同", statementStatus:"无对账单", amount:37737, amountConfirmed:true, note:"未签合同无对账单。"}),
+      mk({customer:"湖南时展辰建设工程有限公司", project:"老旧小区改造(窑湾鲁班店社区·湘潭宾馆·大湖南路沿线片区)", supplyPeriod:"2025年6、7、8月", reconStatus:"已对账", statementStatus:"已归档", contractStatus:"无合同", amount:19743.5, amountConfirmed:true, note:"有黄卓签对账单，无合同。"}),
+      mk({customer:"湖南鑫达辉贸易有限公司", project:"雨湖区老旧小区改造(昭潭街道)", contact:"张永", contractStatus:"已归档", statementStatus:"无对账单", amount:12025, amountConfirmed:true, note:"有合同无对账单；小票及对账单2025年9月移交曾永红（对账否）。项目负责人张永。"}),
+      mk({customer:"湖南云东建设", project:"教育装备智能基地建设项目", contact:"王卫星", supplyPeriod:"2025年11月", contractStatus:"无合同", statementStatus:"已签存疑", amount:48220, amountConfirmed:true, note:"对账单已签字（是否有效待核实），无合同。"}),
+      mk({customer:"湖南东铭工程建设有限公司", project:"沙子岭猪生态繁养基地", contact:"王卫星", supplyPeriod:"2025年12月", contractStatus:"无合同", statementStatus:"已签存疑", amount:96160, amountConfirmed:true, note:"对账单已签字（是否有效待核实），无合同。"}),
+      mk({customer:"立新村产业路", project:"", supplyPeriod:"2025年12月至2026年1月", contractStatus:"无合同", statementStatus:"已归档", amount:46420, amountConfirmed:true, note:"对账单已签字，无合同。"}),
+      mk({customer:"沙坪建筑有限公司", project:"长城污水分流项目-羊牯村施工地", supplyPeriod:"2026年1月", reconStatus:"未对账", amount:229870, amountConfirmed:true, note:"未对账，总欠款229870。"}),
+      mk({customer:"沙坪建设工程有限公司", project:"姜畲雨污分流项目", contact:"杨成辉", supplyPeriod:"2025年11、12月", reconStatus:"未对账", contractStatus:"无合同", amount:115045, amountConfirmed:true, note:"未对账，无合同。"}),
+      mk({customer:"益阳孟辉建设有限公司", project:"沙塘村黄府别墅(现金单)", supplyPeriod:"2024年9月", amount:3635.5, amountConfirmed:true, due:"2024-12-31", note:"现金单，至今欠款3635.5元，逾期约一年半。"}),
+      mk({customer:"湖南涟钢建设有限公司(原湖南沫均科技)", project:"新能源永磁同步驱动电机热工装备研发制造基地项目", supplyPeriod:"2025年8月至2026年", reconStatus:"未对账", contractStatus:"无合同", amount:643562.5, amountConfirmed:false, note:"供货单位名称由湖南沫均科技改为湖南涟钢建设。单价是否确定？回款还是易货？金额待确定。截至3月总计约643562.5。"}),
+      mk({customer:"湘潭货场(凯骏)", project:"自提调料", reconStatus:"未对账", amount:2115, amountConfirmed:true, note:"凯骏从我司调料自提，未对账，欠款2115。"}),
+      mk({customer:"湖南众城混凝土有限公司", project:"长城污水分流项目-羊牯村施工地(借料)", supplyPeriod:"2025年9月", reconStatus:"未对账", amount:563, amountConfirmed:false, note:"2025年9月从我司借料1方C35。单价是否与对方核实？未对账，对接人是否跟进？"}),
+      mk({customer:"怡亚通(湘潭)供应链整合基地", project:"梁园", statementStatus:"对账单未签", amountConfirmed:false, note:"2.2号C30第7车次单张票10方无签单票（调度室重打未签回）；2.3号手写票未换票；2.4/2.5号票未归（众城代打未给我司小票），重打小票仍在调度室。"}),
+      mk({customer:"湖南省石常建设有限公司", project:"国网电力检修及物资检测周转基地项目", supplyPeriod:"2026年1、2、3月", reconStatus:"未对账", statementStatus:"无对账单", contractStatus:"无合同", note:"无对账单、无合同。"}),
+      mk({customer:"益阳市赫山区清波建材", project:"湘潭市撒欢杨梅洲城市公园项目", supplyPeriod:"2026年2-4月", statementStatus:"无对账单", contractStatus:"无合同", note:"无合同无对账单。"}),
+      mk({customer:"湖南湘军建筑工程有限公司", project:"湖南裕能五期", supplyPeriod:"2026年1月起", reconStatus:"已对账", contractStatus:"无合同", note:"1、2、3月已对账，无合同。"}),
+      mk({customer:"华实安装有限公司", project:"湖南裕能四期回转窑项目", supplyPeriod:"2026年3月", reconStatus:"未对账", contractStatus:"无合同", note:"未对账，无合同。"}),
+      mk({customer:"湘潭市雨湖区水利建设项目服务中心(中建远发)", project:"", supplyPeriod:"2026年1至2月", statementStatus:"无对账单", contractStatus:"无合同", amount:11145, amountConfirmed:true, note:"目前欠款11145元，无对账单无合同。"}),
     ];
   }
 
@@ -801,7 +894,7 @@
   load();
   bindAutoCalc();
   render();
-  window.addEventListener("keydown",e=>{ if(e.key==="Escape"){ closeEdit(); closeSet(); } });
+  window.addEventListener("keydown",e=>{ if(e.key==="Escape"){ closeEdit(); closeSet(); closeImp(); } });
 })();
 </script>
 </body>
