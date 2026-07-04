@@ -10,7 +10,6 @@
     --txt:#e6edf3; --muted:#8aa0b4; --accent:#3d8bff; --accent2:#2563eb;
     --ok:#2ec27e; --warn:#f5a623; --bad:#ff5c5c; --chip:#22303d;
     --shadow:0 6px 24px rgba(0,0,0,.35);
-    --sand:#e0b060; --stone:#9aa0a6; --cement:#7f8fa6; --flyash:#b98cff; --admix:#38c6c6;
   }
   @media (prefers-color-scheme: light){
     :root{
@@ -39,28 +38,29 @@
   main{max-width:1180px;margin:0 auto;padding:18px}
   .btn{background:var(--accent2);color:#fff;border:none;padding:8px 14px;border-radius:8px;cursor:pointer;font-size:13px;
     display:inline-flex;align-items:center;gap:6px}
-  .btn:hover{filter:brightness(1.08)}
+  .btn:hover{filter:brightness(1.08)} .btn:disabled{opacity:.5;cursor:not-allowed}
   .btn.ghost{background:var(--chip);color:var(--txt);border:1px solid var(--line)}
   .btn.sm{padding:5px 9px;font-size:12px}
   .btn.danger{background:transparent;color:var(--bad);border:1px solid var(--line)}
   .btn.danger:hover{background:rgba(255,92,92,.12)}
   .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;box-shadow:var(--shadow);margin-bottom:16px}
-  .card h2{margin:0 0 4px;font-size:16px}
-  .card .sub{color:var(--muted);font-size:12.5px;margin-bottom:14px}
+  .card h2{margin:0 0 4px;font-size:16px} .card .sub{color:var(--muted);font-size:12.5px;margin-bottom:14px}
   .grid{display:grid;gap:14px}
-  .kpis{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}
+  .kpis{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}
   .kpi{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow);position:relative;overflow:hidden}
-  .kpi .bar{position:absolute;left:0;top:0;bottom:0;width:4px}
-  .kpi .name{color:var(--muted);font-size:12.5px;display:flex;align-items:center;gap:6px}
-  .kpi .val{font-size:24px;font-weight:700;margin-top:6px}
+  .kpi .bar{position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent)}
+  .kpi .name{color:var(--muted);font-size:12.5px}
+  .kpi .val{font-size:23px;font-weight:700;margin-top:6px}
   .kpi .unit{font-size:13px;color:var(--muted);font-weight:400;margin-left:3px}
   .kpi .meta{font-size:12px;color:var(--muted);margin-top:4px}
-  .kpi.alert{border-color:var(--bad)}
+  .kpi.alert{border-color:var(--bad)} .kpi.alert .bar{background:var(--bad)}
+  .kpi.low{border-color:var(--warn)} .kpi.low .bar{background:var(--warn)}
   table{width:100%;border-collapse:collapse;font-size:13px}
   th,td{text-align:right;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
   th:first-child,td:first-child,th.l,td.l{text-align:left}
   thead th{color:var(--muted);font-weight:600;font-size:12px;background:var(--panel2);position:sticky;top:0}
   tbody tr:hover{background:var(--panel2)}
+  tfoot td{font-weight:600;border-top:2px solid var(--line)}
   .tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
   .form-row{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));align-items:end}
   label.field{display:flex;flex-direction:column;gap:5px;font-size:12.5px;color:var(--muted)}
@@ -69,6 +69,7 @@
     padding:8px 10px;font-size:14px;font-family:inherit;width:100%}
   input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent)}
   input[readonly]{color:var(--muted);background:var(--chip)}
+  table input{padding:5px 7px;font-size:13px;text-align:right}
   .chip{display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:20px;font-size:12px;background:var(--chip);border:1px solid var(--line)}
   .tag{padding:2px 8px;border-radius:6px;font-size:12px;font-weight:600}
   .tag.ok{background:rgba(46,194,126,.15);color:var(--ok)}
@@ -76,33 +77,27 @@
   .tag.bad{background:rgba(255,92,92,.15);color:var(--bad)}
   .tag.mut{background:var(--chip);color:var(--muted)}
   .num{font-variant-numeric:tabular-nums}
-  .pos{color:var(--bad)} .neg{color:var(--ok)}
-  .muted{color:var(--muted)}
+  .pos{color:var(--bad)} .neg{color:var(--ok)} .muted{color:var(--muted)}
   .row-actions{display:flex;gap:6px;justify-content:flex-end}
   .empty{padding:36px;text-align:center;color:var(--muted)}
-  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin-bottom:14px}
   .toolbar .spacer{flex:1}
   .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:8px}
   .legend i{width:10px;height:10px;border-radius:3px;display:inline-block;margin-right:5px;vertical-align:middle}
   dialog{border:1px solid var(--line);border-radius:14px;background:var(--panel);color:var(--txt);padding:0;
-    box-shadow:var(--shadow);max-width:560px;width:92vw}
+    box-shadow:var(--shadow);max-width:620px;width:94vw}
   dialog::backdrop{background:rgba(0,0,0,.55)}
   dialog .dhead{padding:14px 18px;border-bottom:1px solid var(--line);font-weight:600;display:flex;align-items:center}
-  dialog .dbody{padding:18px}
+  dialog .dbody{padding:18px;max-height:70vh;overflow:auto}
   dialog .dfoot{padding:12px 18px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:flex-end}
   .close{margin-left:auto;background:transparent;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1}
-  .bar-mini{height:7px;border-radius:4px;background:var(--chip);overflow:hidden;margin-top:6px}
-  .bar-mini i{display:block;height:100%}
   .hint{background:var(--panel2);border:1px dashed var(--line);border-radius:10px;padding:12px 14px;color:var(--muted);font-size:12.5px;margin-bottom:14px}
   .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--panel);border:1px solid var(--line);
     padding:10px 18px;border-radius:10px;box-shadow:var(--shadow);z-index:99;opacity:0;transition:.25s;pointer-events:none}
   .toast.show{opacity:1}
   .split{display:grid;grid-template-columns:1fr;gap:16px}
   @media(min-width:820px){.split.two{grid-template-columns:1fr 1fr}}
-  .mat-dot{width:10px;height:10px;border-radius:50%;display:inline-block}
-  details.mixcard{border:1px solid var(--line);border-radius:10px;padding:0;margin-bottom:10px;background:var(--panel2)}
-  details.mixcard summary{padding:12px 14px;cursor:pointer;font-weight:600;display:flex;align-items:center;gap:10px}
-  details.mixcard .mixbody{padding:0 14px 14px}
+  .mat-dot{width:9px;height:9px;border-radius:50%;display:inline-block;background:var(--accent);margin-right:5px}
   @media print{header.topbar,nav.tabs,.toolbar,.row-actions,.btn{display:none!important}body{background:#fff}}
 </style>
 </head>
@@ -113,7 +108,7 @@
   <div class="spacer"></div>
   <div class="tools">
     <button class="btn ghost sm" onclick="exportBackup()">导出备份</button>
-    <button class="btn ghost sm" onclick="document.getElementById('importFile').click()">导入</button>
+    <button class="btn ghost sm" onclick="document.getElementById('importFile').click()">恢复备份</button>
     <input type="file" id="importFile" accept="application/json" style="display:none" onchange="importBackup(this)"/>
     <button class="btn ghost sm" onclick="loadDemo()">示例数据</button>
   </div>
@@ -123,9 +118,8 @@
 <main id="view"></main>
 <div class="toast" id="toast"></div>
 
-<!-- 通用编辑弹窗 -->
 <dialog id="dlg">
-  <form method="dialog" id="dlgForm">
+  <form method="dialog">
     <div class="dhead"><span id="dlgTitle">编辑</span><button type="button" class="close" onclick="document.getElementById('dlg').close()">×</button></div>
     <div class="dbody" id="dlgBody"></div>
     <div class="dfoot">
@@ -137,40 +131,43 @@
 
 <script>
 /* =========================================================================
-   原材料进销存 — 单文件应用（数据保存在浏览器本地 localStorage）
-   材料：砂 石 水泥 粉煤灰 外加剂
-   核心：进货过磅 → 库存 → 按配比计算理论消耗 → 与实盘对比 → 损耗预警
+   原材料进销存 — 混凝土搅拌站（单文件，数据存浏览器 localStorage）
+   口径贴合日报表：理论应耗 = 配料主机「电脑消耗」；进厂 = 过磅入库
+   账面库存 = 期初 + 进厂 − 电脑消耗（滚动结转，遇盘点则以实盘为新基准）
+   损耗 = 实际消耗(期初+进厂−期末实盘) − 电脑消耗；超阈值或账面倒挂即预警
    ========================================================================= */
+const LS_KEY = "rmi_inventory_v2";
 
-const LS_KEY = "rmi_inventory_v1";
-const T = 1000; // 1吨 = 1000kg
-
-/* ---------- 默认材料（可增改）。单位统一为“吨”。lossThreshold=损耗率预警阈值(%) ---------- */
+/* 默认材料按“大类”（合并各仓/线）。unit=吨。lossThreshold=损耗率预警阈值(%)
+   aliases 用于粘贴导入时把原始列名（如“1线水泥”“聚羧酸”“0-5籽”）归到大类 */
 const DEFAULT_MATERIALS = [
-  { id:"sand",   name:"砂",     unit:"吨", color:"var(--sand)",   opening:0, warnLow:200, lossThreshold:3.0 },
-  { id:"stone",  name:"石",     unit:"吨", color:"var(--stone)",  opening:0, warnLow:200, lossThreshold:2.5 },
-  { id:"cement", name:"水泥",   unit:"吨", color:"var(--cement)", opening:0, warnLow:100, lossThreshold:1.5 },
-  { id:"flyash", name:"粉煤灰", unit:"吨", color:"var(--flyash)", opening:0, warnLow:80,  lossThreshold:2.0 },
-  { id:"admix",  name:"外加剂", unit:"吨", color:"var(--admix)",  opening:0, warnLow:10,  lossThreshold:2.0 },
+  { id:"cement", name:"水泥",  opening:0, warnLow:100, lossThreshold:1.5, aliases:["水泥","1线水泥","2线水泥","1仓","2仓"] },
+  { id:"slag",   name:"矿粉",  opening:0, warnLow:80,  lossThreshold:1.5, aliases:["矿粉"] },
+  { id:"flyash", name:"粉煤灰",opening:0, warnLow:80,  lossThreshold:2.0, aliases:["粉煤灰"] },
+  { id:"expand", name:"膨胀剂",opening:0, warnLow:10,  lossThreshold:2.0, aliases:["膨胀剂"] },
+  { id:"stpow",  name:"石粉",  opening:0, warnLow:50,  lossThreshold:2.0, aliases:["石粉"] },
+  { id:"msand",  name:"机制砂",opening:0, warnLow:200, lossThreshold:3.0, aliases:["机制砂","粗砂","洗砂"] },
+  { id:"fsand",  name:"细砂",  opening:0, warnLow:100, lossThreshold:3.0, aliases:["细砂","天然砂"] },
+  { id:"gravel", name:"碎石",  opening:0, warnLow:200, lossThreshold:2.5, aliases:["碎石","0-5籽","1-2籽","0-5","石子"] },
+  { id:"pebble", name:"卵石",  opening:0, warnLow:100, lossThreshold:2.5, aliases:["卵石"] },
+  { id:"admix",  name:"外加剂",opening:0, warnLow:10,  lossThreshold:2.0, aliases:["外加剂","聚羧酸"] },
+  { id:"eadmix", name:"早强剂",opening:0, warnLow:5,   lossThreshold:2.0, aliases:["早强","早强外加剂"] },
+  { id:"diesel", name:"柴油",  opening:0, warnLow:2,   lossThreshold:1.0, aliases:["柴油","0#"] },
+  { id:"urea",   name:"尿素",  opening:0, warnLow:1,   lossThreshold:2.0, aliases:["尿素"] },
 ];
 
 let state = load();
-
 function load(){
-  try{
-    const raw = localStorage.getItem(LS_KEY);
-    if(raw){ const s = JSON.parse(raw); return normalize(s); }
-  }catch(e){ console.warn(e); }
+  try{ const raw=localStorage.getItem(LS_KEY); if(raw) return normalize(JSON.parse(raw)); }catch(e){ console.warn(e); }
   return normalize({});
 }
 function normalize(s){
   return {
     plantName: s.plantName || "未命名搅拌站",
-    materials: (s.materials && s.materials.length) ? s.materials : structuredClone(DEFAULT_MATERIALS),
-    purchases: s.purchases || [],   // 进货过磅 {id,date,materialId,supplier,vehicle,gross,tare,net,price,amount,note}
-    mixes:     s.mixes     || [],   // 配比 {id,grade,name,ratios:{materialId:kgPerM3},note}
-    productions:s.productions||[],  // 生产领用 {id,date,mixId,volume,note}
-    counts:    s.counts    || [],   // 盘点 {id,date,materialId,actual,note}
+    materials: (s.materials&&s.materials.length)? s.materials : structuredClone(DEFAULT_MATERIALS),
+    daily:  s.daily  || [],   // {id,date,materialId,cons,inbound}  电脑消耗/进厂（吨）
+    counts: s.counts || [],   // {id,date,materialId,actual,note}   实盘（吨）
+    meta:   s.meta   || [],   // {id,date,volTotal,volC30,sales,note} 生产/销售方量
   };
 }
 function save(){ localStorage.setItem(LS_KEY, JSON.stringify(state)); }
@@ -179,611 +176,430 @@ const fmt = (n,d=2)=> (n==null||isNaN(n))?"—":Number(n).toLocaleString("zh-CN"
 const fmt0 = n => fmt(n,0);
 const today = ()=> new Date().toISOString().slice(0,10);
 const mat = id => state.materials.find(m=>m.id===id);
-function toast(msg){ const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove("show"),1800); }
+function toast(m){ const t=document.getElementById("toast"); t.textContent=m; t.classList.add("show"); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove("show"),1900); }
+const esc = s => String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const dayAfter  = d=>{const x=new Date(d);x.setDate(x.getDate()+1);return x.toISOString().slice(0,10);};
+const dayBefore = d=>{const x=new Date(d);x.setDate(x.getDate()-1);return x.toISOString().slice(0,10);};
+function inRange(d,f,t){ if(f&&d<f)return false; if(t&&d>t)return false; return true; }
 
 /* ================= 计算引擎 ================= */
+const sumDaily=(mid,key,f,t)=> state.daily.filter(r=>r.materialId===mid&&inRange(r.date,f,t)).reduce((s,r)=>s+(+r[key]||0),0);
 
-// 某材料在 [—,dateEnd] 区间的进货合计（吨）
-function purchasedSum(materialId, from, to){
-  return state.purchases
-    .filter(p=>p.materialId===materialId && inRange(p.date,from,to))
-    .reduce((s,p)=>s+(+p.net||0),0);
+// 期初来源：截止 asOf(含) 最近一次盘点；无则材料期初
+function openingAt(mid, asOf){
+  const cs=state.counts.filter(c=>c.materialId===mid&&(!asOf||c.date<=asOf)).sort((a,b)=>a.date<b.date?1:-1);
+  if(cs.length) return {value:+cs[0].actual, source:"盘点 "+cs[0].date};
+  return {value:+(mat(mid).opening||0), source:"期初设置"};
 }
-// 理论消耗（吨）：遍历生产记录，按配比 kg/m³ × 方量，再 /1000
-function theoreticalUse(materialId, from, to){
-  let kg = 0;
-  for(const pr of state.productions){
-    if(!inRange(pr.date,from,to)) continue;
-    const mix = state.mixes.find(m=>m.id===pr.mixId);
-    if(!mix) continue;
-    const r = (mix.ratios && mix.ratios[materialId]) || 0;
-    kg += r * (+pr.volume||0);
-  }
-  return kg / T;
+// 账面库存（截止 asOf，默认至今）= 最近盘点(或期初) + 之后进厂 − 之后电脑消耗
+function bookStock(mid, asOf){
+  asOf = asOf || "9999-12-31";
+  const cs=state.counts.filter(c=>c.materialId===mid&&c.date<=asOf).sort((a,b)=>a.date<b.date?1:-1);
+  let base, from;
+  if(cs.length){ base=+cs[0].actual; from=dayAfter(cs[0].date); }
+  else { base=+(mat(mid).opening||0); from=null; }
+  return base + sumDaily(mid,"inbound",from,asOf) - sumDaily(mid,"cons",from,asOf);
 }
-function inRange(date, from, to){
-  if(from && date < from) return false;
-  if(to && date > to) return false;
-  return true;
-}
-// 期初来源：截止 asOf(含) 之前最近一次盘点的实盘；无则用 material.opening
-function openingAt(materialId, asOf){
-  const cs = state.counts
-    .filter(c=>c.materialId===materialId && (!asOf || c.date<=asOf))
-    .sort((a,b)=> a.date<b.date?1:-1);
-  if(cs.length) return { value:+cs[0].actual, source:"盘点("+cs[0].date+")", date:cs[0].date };
-  return { value:+ (mat(materialId).opening||0), source:"期初设置", date:null };
-}
-// 账面库存（截止今天）：期初 + 进货 − 理论消耗；若期间有盘点则以最近盘点为新基准
-function bookStock(materialId){
-  const base = openingAt(materialId, null); // 若从没盘点，用 opening
-  // 找最近一次盘点作为基准，之后的进货/理论消耗叠加
-  const cs = state.counts.filter(c=>c.materialId===materialId).sort((a,b)=> a.date<b.date?1:-1);
-  if(cs.length){
-    const anchor = cs[0];
-    const inc = purchasedSum(materialId, dayAfter(anchor.date), null);
-    const use = theoreticalUse(materialId, dayAfter(anchor.date), null);
-    return { value:(+anchor.actual)+inc-use, anchorDate:anchor.date, purchased:inc, used:use };
-  }
-  const inc = purchasedSum(materialId, null, null);
-  const use = theoreticalUse(materialId, null, null);
-  return { value:(mat(materialId).opening||0)+inc-use, anchorDate:null, purchased:inc, used:use };
-}
-function dayAfter(d){ const x=new Date(d); x.setDate(x.getDate()+1); return x.toISOString().slice(0,10); }
-
-// 损耗分析：给定区间 [from,to]，返回每材料 {期初,进货,理论消耗,期末实盘,实际消耗,损耗,损耗率,状态}
-function lossAnalysis(from, to){
+// 损耗分析
+function lossAnalysis(from,to){
   return state.materials.map(m=>{
-    const open = openingAt(m.id, from ? dayBefore(from) : null);
-    const purchased = purchasedSum(m.id, from, to);
-    const theo = theoreticalUse(m.id, from, to);
-    // 期末实盘：区间内(≤to)最近一次盘点
-    const endCounts = state.counts.filter(c=>c.materialId===m.id && (!to||c.date<=to) && (!from||c.date>=from))
-      .sort((a,b)=> a.date<b.date?1:-1);
-    const endCount = endCounts[0] || null;
-    let actualUse=null, loss=null, rate=null, status="nodata";
+    const open=openingAt(m.id, from?dayBefore(from):null);
+    const inbound=sumDaily(m.id,"inbound",from,to);
+    const cons=sumDaily(m.id,"cons",from,to);          // 电脑消耗 = 理论应耗
+    const ends=state.counts.filter(c=>c.materialId===m.id&&(!to||c.date<=to)&&(!from||c.date>=from)).sort((a,b)=>a.date<b.date?1:-1);
+    const endCount=ends[0]||null;
+    const book=bookStock(m.id,to);                      // 截止期末账面
+    let actualUse=null,loss=null,rate=null,status="nodata";
     if(endCount){
-      const endVal = +endCount.actual;
-      actualUse = open.value + purchased - endVal;         // 实际消耗
-      loss = actualUse - theo;                              // 损耗（+超耗 -节余）
-      rate = theo>0 ? (loss/theo*100) : (loss!==0? Infinity: 0);
-      const th = +m.lossThreshold||0;
-      if(Math.abs(rate)===Infinity || Math.abs(rate)>th) status = (rate>0?"over":"under");
-      else status="ok";
+      const endVal=+endCount.actual;
+      actualUse=open.value+inbound-endVal;
+      loss=actualUse-cons;
+      rate=cons>0?(loss/cons*100):(loss!==0?Infinity:0);
+      const th=+m.lossThreshold||0;
+      status=(Math.abs(rate)===Infinity||Math.abs(rate)>th)?(rate>0?"over":"under"):"ok";
     }
-    return { m, opening:open, purchased, theo, endCount, actualUse, loss, rate, status };
+    return {m,open,inbound,cons,endCount,book,actualUse,loss,rate,status};
   });
 }
-function dayBefore(d){ const x=new Date(d); x.setDate(x.getDate()-1); return x.toISOString().slice(0,10); }
 
-/* ================= 视图路由 ================= */
-const TABS = [
-  {id:"dash",  label:"📊 总览"},
-  {id:"buy",   label:"🚚 进货过磅"},
-  {id:"mix",   label:"⚗️ 配比管理"},
-  {id:"prod",  label:"🏭 生产领用"},
-  {id:"count", label:"📋 库存盘点"},
-  {id:"loss",  label:"🔍 损耗分析"},
-  {id:"mats",  label:"⚙️ 材料设置"},
+/* ================= 视图 ================= */
+const TABS=[
+  {id:"dash", label:"📊 总览"},
+  {id:"daily",label:"📝 生产日报"},
+  {id:"count",label:"📋 库存盘点"},
+  {id:"loss", label:"🔍 损耗分析"},
+  {id:"mats", label:"⚙️ 材料设置"},
 ];
-let current = "dash";
-function renderTabs(){
-  document.getElementById("tabs").innerHTML = TABS.map(t=>
-    `<button class="${t.id===current?'active':''}" onclick="go('${t.id}')">${t.label}</button>`).join("");
-}
-function go(id){ current=id; renderTabs(); render(); window.scrollTo(0,0); }
+let current="dash";
+function renderTabs(){ document.getElementById("tabs").innerHTML=TABS.map(t=>`<button class="${t.id===current?'active':''}" onclick="go('${t.id}')">${t.label}</button>`).join(""); }
+function go(id){ current=id; renderTabs(); render(); scrollTo(0,0); }
 function render(){
-  document.getElementById("plantName").textContent = state.plantName;
-  const v = document.getElementById("view");
-  v.innerHTML = ({dash:viewDash,buy:viewBuy,mix:viewMix,prod:viewProd,count:viewCount,loss:viewLoss,mats:viewMats}[current])();
+  document.getElementById("plantName").textContent=state.plantName;
+  document.getElementById("view").innerHTML=({dash:viewDash,daily:viewDaily,count:viewCount,loss:viewLoss,mats:viewMats}[current])();
   if(window["after_"+current]) window["after_"+current]();
 }
 
 /* ---------- 总览 ---------- */
 function viewDash(){
-  const cards = state.materials.map(m=>{
-    const bs = bookStock(m.id);
-    const low = bs.value < (m.warnLow||0);
-    const cap = Math.max(bs.value, m.warnLow*2, 1);
-    const pct = Math.max(0,Math.min(100, bs.value/cap*100));
-    return `<div class="kpi ${low?'alert':''}">
-      <span class="bar" style="background:${m.color}"></span>
-      <div class="name"><span class="mat-dot" style="background:${m.color}"></span>${m.name}</div>
-      <div class="val num">${fmt(bs.value)}<span class="unit">${m.unit}</span></div>
-      <div class="bar-mini"><i style="width:${pct}%;background:${low?'var(--bad)':m.color}"></i></div>
-      <div class="meta">${low?'⚠ 低于安全库存 '+fmt0(m.warnLow):'安全库存 '+fmt0(m.warnLow)+m.unit}</div>
+  const cards=state.materials.map(m=>{
+    const s=bookStock(m.id);
+    const neg=s<-0.001, low=!neg && s<(m.warnLow||0);
+    const cls=neg?"alert":low?"low":"";
+    return `<div class="kpi ${cls}">
+      <span class="bar"></span>
+      <div class="name"><span class="mat-dot"></span>${m.name}</div>
+      <div class="val num">${fmt(s)}<span class="unit">吨</span></div>
+      <div class="meta">${neg?'⛔ 账面倒挂（进厂漏记/消耗虚高）':low?('⚠ 低于安全库存 '+fmt0(m.warnLow)):('安全库存 '+fmt0(m.warnLow)+'吨')}</div>
     </div>`;
   }).join("");
-
-  // 待办提醒：库存告警 + 从未盘点
-  const lowItems = state.materials.filter(m=>bookStock(m.id).value < (m.warnLow||0));
-  const noCount  = state.materials.filter(m=>!state.counts.some(c=>c.materialId===m.id));
-  const totalBuy = state.purchases.reduce((s,p)=>s+(+p.amount||0),0);
-
+  const neg=state.materials.filter(m=>bookStock(m.id)<-0.001);
+  const low=state.materials.filter(m=>{const s=bookStock(m.id);return s>=-0.001&&s<(m.warnLow||0);});
+  const noCount=state.materials.filter(m=>!state.counts.some(c=>c.materialId===m.id));
+  const totCons=state.daily.reduce((s,r)=>s+(+r.cons||0),0), totIn=state.daily.reduce((s,r)=>s+(+r.inbound||0),0);
+  const vol=state.meta.reduce((s,m)=>s+(+m.volTotal||0),0);
   return `
   <div class="grid kpis">${cards}</div>
-
   <div class="split two">
-    <div class="card">
-      <h2>经营快照</h2>
-      <div class="sub">账面数据（期初 + 进货 − 理论消耗；若有盘点则以最近盘点为基准）</div>
+    <div class="card"><h2>累计快照</h2><div class="sub">全部日报汇总（账面 = 期初 + 进厂 − 电脑消耗）</div>
       <table><tbody>
-        <tr><td class="l">进货单据</td><td class="num">${state.purchases.length} 单</td></tr>
-        <tr><td class="l">进货金额合计</td><td class="num">¥ ${fmt(totalBuy)}</td></tr>
-        <tr><td class="l">配比方案</td><td class="num">${state.mixes.length} 个</td></tr>
-        <tr><td class="l">生产记录</td><td class="num">${state.productions.length} 条 / ${fmt(state.productions.reduce((s,p)=>s+(+p.volume||0),0))} m³</td></tr>
+        <tr><td class="l">日报天数</td><td class="num">${new Set(state.daily.map(r=>r.date)).size} 天</td></tr>
+        <tr><td class="l">累计进厂</td><td class="num">${fmt(totIn)} 吨</td></tr>
+        <tr><td class="l">累计电脑消耗</td><td class="num">${fmt(totCons)} 吨</td></tr>
+        <tr><td class="l">累计生产方量</td><td class="num">${fmt(vol)} m³</td></tr>
         <tr><td class="l">盘点记录</td><td class="num">${state.counts.length} 条</td></tr>
       </tbody></table>
     </div>
-    <div class="card">
-      <h2>待办与预警</h2>
-      <div class="sub">需要关注的事项</div>
-      ${lowItems.length? lowItems.map(m=>`<div class="chip" style="margin:0 6px 8px 0"><span class="mat-dot" style="background:${m.color}"></span>${m.name} 库存偏低</div>`).join("") : ''}
-      ${noCount.length? `<div class="hint" style="margin-top:4px">尚未盘点：${noCount.map(m=>m.name).join("、")}。<b>损耗分析需要盘点数据</b>——盘点后才能对比理论用量、发现跑冒滴漏。</div>`:''}
-      ${(!lowItems.length && !noCount.length)? '<div class="empty">一切正常 ✓</div>':''}
+    <div class="card"><h2>待办与预警</h2><div class="sub">需要关注的事项</div>
+      ${neg.length?`<div class="hint" style="border-color:var(--bad);color:var(--txt)"><b style="color:var(--bad)">⛔ 账面倒挂：</b>${neg.map(m=>m.name+'（'+fmt(bookStock(m.id))+'吨）').join('、')}。账面已为负，说明进厂漏记或电脑消耗虚高，务必核对过磅与主机数据。</div>`:''}
+      ${low.length?low.map(m=>`<div class="chip" style="margin:0 6px 8px 0"><span class="mat-dot"></span>${m.name} 库存偏低</div>`).join(''):''}
+      ${noCount.length?`<div class="hint">尚未盘点：${noCount.map(m=>m.name).join('、')}。<b>损耗分析需要盘点数据</b>——盘点后才能对比电脑消耗、发现跑冒滴漏。</div>`:''}
+      ${(!neg.length&&!low.length&&!noCount.length)?'<div class="empty">一切正常 ✓</div>':''}
       <button class="btn" style="margin-top:6px" onclick="go('loss')">🔍 去做损耗分析</button>
     </div>
   </div>`;
 }
 
-/* ---------- 进货过磅 ---------- */
-function viewBuy(){
-  const rows = [...state.purchases].sort((a,b)=>a.date<b.date?1:-1).map(p=>{
-    const m = mat(p.materialId)||{name:"?",unit:""};
-    return `<tr>
-      <td class="l">${p.date}</td>
-      <td class="l"><span class="mat-dot" style="background:${m.color}"></span> ${m.name}</td>
-      <td class="l">${esc(p.supplier||'')}</td>
-      <td class="l">${esc(p.vehicle||'')}</td>
-      <td class="num">${fmt(p.gross)}</td>
-      <td class="num">${fmt(p.tare)}</td>
-      <td class="num"><b>${fmt(p.net)}</b></td>
-      <td class="num">${p.price?fmt(p.price):'—'}</td>
-      <td class="num">${p.amount?'¥'+fmt(p.amount):'—'}</td>
-      <td class="l muted">${esc(p.note||'')}</td>
-      <td><div class="row-actions">
-        <button class="btn ghost sm" onclick="editBuy('${p.id}')">改</button>
-        <button class="btn danger sm" onclick="del('purchases','${p.id}')">删</button>
-      </div></td></tr>`;
-  }).join("");
+/* ---------- 生产日报（核心录入，含粘贴导入） ---------- */
+let dailyDate = today();
+function viewDaily(){
   return `
   <div class="card">
-    <h2>进货过磅记录</h2>
-    <div class="sub">毛重 − 皮重 = 净重（入库量）。净重自动累加进库存。</div>
+    <h2>生产日报</h2>
+    <div class="sub">按天录入各材料的「电脑消耗」（配料主机理论应耗）与「进厂」（过磅入库），单位：吨。账面库存自动滚动结转。</div>
     <div class="toolbar">
-      <button class="btn" onclick="editBuy()">＋ 新增过磅单</button>
+      <label class="field" style="max-width:180px"><span>日期</span><input type="date" id="dDate" value="${dailyDate}" onchange="dailyDate=this.value;render()"></label>
+      <button class="btn ghost" onclick="importPaste()">📥 从粘贴表格填充</button>
       <div class="spacer"></div>
-      <button class="btn ghost sm" onclick="exportCSV('purchases')">导出CSV</button>
+      <button class="btn" onclick="saveDaily()">保存本日</button>
     </div>
-    <div class="tablewrap">
-    ${state.purchases.length? `<table>
-      <thead><tr><th class="l">日期</th><th class="l">材料</th><th class="l">供应商</th><th class="l">车号</th>
-      <th>毛重</th><th>皮重</th><th>净重(吨)</th><th>单价</th><th>金额</th><th class="l">备注</th><th></th></tr></thead>
-      <tbody>${rows}</tbody></table>`
-    : `<div class="empty">还没有进货记录，点击「新增过磅单」开始。</div>`}
+    <div class="tablewrap"><table>
+      <thead><tr><th class="l">材料</th><th>电脑消耗 (吨)</th><th>进厂 (吨)</th><th>当日账面库存</th></tr></thead>
+      <tbody>${state.materials.map(m=>{
+        const r=state.daily.find(x=>x.date===dailyDate&&x.materialId===m.id)||{};
+        const book=bookStock(m.id,dailyDate);
+        return `<tr>
+          <td class="l"><span class="mat-dot"></span>${m.name}</td>
+          <td><input type="number" step="0.001" id="c_${m.id}" value="${r.cons??''}" placeholder="0"></td>
+          <td><input type="number" step="0.001" id="i_${m.id}" value="${r.inbound??''}" placeholder="0"></td>
+          <td class="num ${book<-0.001?'pos':''}">${fmt(book)}</td>
+        </tr>`;}).join("")}</tbody>
+    </table></div>
+    <div class="form-row" style="margin-top:14px;max-width:640px">
+      <label class="field"><span>本日生产方量 (m³)</span><input type="number" step="0.01" id="v_total" value="${(state.meta.find(x=>x.date===dailyDate)||{}).volTotal??''}"></label>
+      <label class="field"><span>其中 C30 (m³)</span><input type="number" step="0.01" id="v_c30" value="${(state.meta.find(x=>x.date===dailyDate)||{}).volC30??''}"></label>
+      <label class="field"><span>本日销售方量 (m³)</span><input type="number" step="0.01" id="v_sales" value="${(state.meta.find(x=>x.date===dailyDate)||{}).sales??''}"></label>
     </div>
-  </div>`;
-}
-
-/* ---------- 配比管理 ---------- */
-function viewMix(){
-  const cards = state.mixes.map(mx=>{
-    const rows = state.materials.map(m=>{
-      const kg = (mx.ratios&&mx.ratios[m.id])||0;
-      return `<tr><td class="l"><span class="mat-dot" style="background:${m.color}"></span> ${m.name}</td>
-        <td class="num">${kg?fmt(kg,1):'—'}</td></tr>`;
-    }).join("");
-    const total = state.materials.reduce((s,m)=>s+((mx.ratios&&mx.ratios[m.id])||0),0);
-    return `<details class="mixcard">
-      <summary><span class="tag ok">${esc(mx.grade||'—')}</span> ${esc(mx.name||'配比方案')}
-        <span class="muted" style="font-weight:400;margin-left:auto">合计 ${fmt0(total)} kg/m³</span></summary>
-      <div class="mixbody">
-        <table><thead><tr><th class="l">材料</th><th>用量 (kg/m³)</th></tr></thead><tbody>${rows}</tbody></table>
-        ${mx.note?`<div class="hint" style="margin-top:10px">${esc(mx.note)}</div>`:''}
-        <div class="row-actions" style="margin-top:10px">
-          <button class="btn ghost sm" onclick="editMix('${mx.id}')">编辑</button>
-          <button class="btn danger sm" onclick="del('mixes','${mx.id}')">删除</button>
-        </div>
-      </div>
-    </details>`;
-  }).join("");
-  return `
+  </div>
   <div class="card">
-    <h2>配比管理</h2>
-    <div class="sub">每种混凝土标号（如 C30）每方（m³）各材料的理论用量，单位 kg/m³。生产时按此计算理论消耗。</div>
-    <div class="toolbar"><button class="btn" onclick="editMix()">＋ 新增配比</button></div>
-    ${state.mixes.length? cards : `<div class="empty">还没有配比方案。先新增一个，例如 C30。</div>`}
+    <h2>日报历史</h2>
+    <div class="toolbar"><div class="spacer"></div><button class="btn ghost sm" onclick="exportDailyCSV()">导出CSV</button></div>
+    <div class="tablewrap">${dailyHistory()}</div>
   </div>`;
 }
-
-/* ---------- 生产领用 ---------- */
-function viewProd(){
-  const rows = [...state.productions].sort((a,b)=>a.date<b.date?1:-1).map(pr=>{
-    const mx = state.mixes.find(m=>m.id===pr.mixId);
-    const use = state.materials.map(m=>{
-      const kg=((mx&&mx.ratios&&mx.ratios[m.id])||0)*(+pr.volume||0);
-      return kg? `${m.name} ${fmt(kg/T,2)}t`:null;
-    }).filter(Boolean).join("， ");
-    return `<tr>
-      <td class="l">${pr.date}</td>
-      <td class="l">${mx?`<span class="tag ok">${esc(mx.grade||'')}</span> ${esc(mx.name||'')}`:'<span class="tag bad">配比已删</span>'}</td>
-      <td class="num"><b>${fmt(pr.volume)}</b> m³</td>
-      <td class="l muted" style="white-space:normal">${use||'—'}</td>
-      <td class="l muted">${esc(pr.note||'')}</td>
-      <td><div class="row-actions">
-        <button class="btn ghost sm" onclick="editProd('${pr.id}')">改</button>
-        <button class="btn danger sm" onclick="del('productions','${pr.id}')">删</button>
-      </div></td></tr>`;
+function dailyHistory(){
+  const dates=[...new Set(state.daily.map(r=>r.date))].sort().reverse();
+  if(!dates.length) return `<div class="empty">还没有日报。选好日期，填入电脑消耗/进厂，点「保存本日」。</div>`;
+  const rows=dates.slice(0,60).map(d=>{
+    const recs=state.daily.filter(r=>r.date===d);
+    const c=recs.reduce((s,r)=>s+(+r.cons||0),0), i=recs.reduce((s,r)=>s+(+r.inbound||0),0);
+    const mv=state.meta.find(x=>x.date===d);
+    return `<tr><td class="l">${d}</td><td class="num">${fmt(c)}</td><td class="num">${fmt(i)}</td>
+      <td class="num">${mv&&mv.volTotal?fmt(mv.volTotal):'—'}</td>
+      <td><div class="row-actions"><button class="btn ghost sm" onclick="dailyDate='${d}';go('daily')">查看/编辑</button>
+        <button class="btn danger sm" onclick="delDay('${d}')">删</button></div></td></tr>`;
   }).join("");
-  return `
-  <div class="card">
-    <h2>生产领用</h2>
-    <div class="sub">按“配比 × 生产方量”计算理论消耗，自动从库存扣减。</div>
-    ${state.mixes.length? '' : '<div class="hint">请先到「配比管理」建立至少一个配比方案。</div>'}
-    <div class="toolbar"><button class="btn" onclick="editProd()" ${state.mixes.length?'':'disabled'}>＋ 新增生产记录</button>
-      <div class="spacer"></div><button class="btn ghost sm" onclick="exportCSV('productions')">导出CSV</button></div>
-    <div class="tablewrap">
-    ${state.productions.length? `<table>
-      <thead><tr><th class="l">日期</th><th class="l">配比</th><th>方量</th><th class="l">理论消耗</th><th class="l">备注</th><th></th></tr></thead>
-      <tbody>${rows}</tbody></table>` : `<div class="empty">还没有生产记录。</div>`}
-    </div>
-  </div>`;
+  return `<table><thead><tr><th class="l">日期</th><th>电脑消耗合计</th><th>进厂合计</th><th>生产方量</th><th></th></tr></thead><tbody>${rows}</tbody></table>`;
 }
+function saveDaily(){
+  const d=dailyDate;
+  state.materials.forEach(m=>{
+    const cons=numv("c_"+m.id), inbound=numv("i_"+m.id);
+    const i=state.daily.findIndex(x=>x.date===d&&x.materialId===m.id);
+    if(cons==null&&inbound==null){ if(i>=0) state.daily.splice(i,1); return; }
+    const obj={id:i>=0?state.daily[i].id:uid(),date:d,materialId:m.id,cons:cons||0,inbound:inbound||0};
+    if(i>=0) state.daily[i]=obj; else state.daily.push(obj);
+  });
+  const mv={volTotal:numv("v_total"),volC30:numv("v_c30"),sales:numv("v_sales")};
+  const mi=state.meta.findIndex(x=>x.date===d);
+  if(mv.volTotal==null&&mv.volC30==null&&mv.sales==null){ if(mi>=0) state.meta.splice(mi,1); }
+  else { const o={id:mi>=0?state.meta[mi].id:uid(),date:d,...mv}; if(mi>=0)state.meta[mi]=o; else state.meta.push(o); }
+  save(); render(); toast("已保存 "+d+" 日报");
+}
+function delDay(d){ if(!confirm("删除 "+d+" 的全部日报数据？")) return;
+  state.daily=state.daily.filter(r=>r.date!==d); state.meta=state.meta.filter(m=>m.date!==d); save(); render(); toast("已删除"); }
+const numv=id=>{const el=document.getElementById(id); if(!el)return null; const v=el.value.trim(); return v===""?null:+v;};
+
+/* ---------- 粘贴导入（best-effort，导入前预览可改） ---------- */
+function importPaste(){
+  openDlg("从粘贴表格填充 · "+dailyDate, `
+    <div class="hint">把材料统计员发的日报表整段复制粘贴到下面（从 Excel/Word 表格复制即可，含表头）。
+      系统会尽力识别<b>电脑消耗</b>与<b>进厂</b>两行，并把各仓/线归到大类。<b>解析后先预览、可手动修改，再确认写入。</b></div>
+    <textarea id="pasteBox" rows="8" placeholder="粘贴到这里…（首行含材料名，某行含“电脑消耗/电脑总消耗”，某行含“日进厂/进厂”）"></textarea>
+    <div style="margin:10px 0"><button type="button" class="btn ghost" onclick="doParse()">解析并预览</button></div>
+    <div id="parsePrev"></div>
+  `, ()=>{
+    // 保存 = 把预览值写入当前日期日报
+    const prev=document.getElementById("parsePrev");
+    if(!prev.dataset.ready){ toast("请先解析并预览"); return false; }
+    state.materials.forEach(m=>{
+      const c=numv("pc_"+m.id), i=numv("pi_"+m.id);
+      if(c==null&&i==null) return;
+      const idx=state.daily.findIndex(x=>x.date===dailyDate&&x.materialId===m.id);
+      const obj={id:idx>=0?state.daily[idx].id:uid(),date:dailyDate,materialId:m.id,cons:c||0,inbound:i||0};
+      if(idx>=0)state.daily[idx]=obj; else state.daily.push(obj);
+    });
+    toast("已导入到 "+dailyDate);
+  });
+}
+function doParse(){
+  const text=document.getElementById("pasteBox").value;
+  const res=parseDailyTable(text);
+  const rows=state.materials.map(m=>{
+    const hit=res.byMat[m.id]||{cons:null,inbound:null};
+    return `<tr><td class="l"><span class="mat-dot"></span>${m.name}</td>
+      <td><input type="number" step="0.001" id="pc_${m.id}" value="${hit.cons??''}"></td>
+      <td><input type="number" step="0.001" id="pi_${m.id}" value="${hit.inbound??''}"></td></tr>`;
+  }).join("");
+  const box=document.getElementById("parsePrev");
+  box.dataset.ready="1";
+  box.innerHTML=`
+    ${res.note?`<div class="hint">${res.note}</div>`:''}
+    <div class="tablewrap"><table><thead><tr><th class="l">材料（大类）</th><th>电脑消耗(吨)</th><th>进厂(吨)</th></tr></thead>
+      <tbody>${rows}</tbody></table></div>
+    ${res.unmatched.length?`<div class="hint" style="margin-top:10px">未能归类的列：${res.unmatched.map(esc).join('、')}。可到「材料设置」为对应大类补充别名，或在上方手动填。</div>`:''}
+    <div class="muted" style="font-size:12px;margin-top:8px">请核对数字无误后点右下角「保存」写入 ${dailyDate} 日报。</div>`;
+}
+// 解析转置日报表：材料在列、指标在行。用“向右延续”处理合并表头，别名归大类。
+function parseDailyTable(text){
+  const lines=text.replace(/\r/g,"").split("\n").filter(l=>l.trim()!=="");
+  const grid=lines.map(l=> l.includes("\t")? l.split("\t") : l.split(/ {2,}|，|,/)).map(r=>r.map(c=>c.trim()));
+  const width=Math.max(0,...grid.map(r=>r.length));
+  // 找指标行（这两行含数字、不是表头）
+  const consRow=grid.find(r=>r.length>=3 && /电脑.*消耗|电脑总消耗|理论.*耗|应耗/.test(r[0]||""));
+  const inRow  =grid.find(r=>r.length>=3 && /(日)?进厂|入库|进货/.test(r[0]||"") && !/月/.test(r[0]||""));
+  const bound = consRow? grid.indexOf(consRow) : grid.length;   // 表头一定在指标行之上
+  // 表头行：指标行之上、最靠上且材料命中≥2 的那一行（父级材料名行，避开仓/线子表头更靠下的干扰）
+  let headerIdx=-1;
+  for(let i=0;i<bound;i++){ if(grid[i].filter(c=>matchMat(c)).length>=2){ headerIdx=i; break; } }
+  if(headerIdx<0){ let best=-1; grid.forEach((r,i)=>{const h=r.filter(c=>matchMat(c)).length; if(h>best){best=h;headerIdx=i;}}); }
+  if(headerIdx<0) return {byMat:{},unmatched:[],note:"没识别到材料表头，请手动填写。"};
+  // 列→大类：父级表头(headerIdx) 向右延续填补合并空格；仅当父级不匹配时才用子表头
+  const h1=grid[headerIdx]||[], h2=(headerIdx+1<bound)? (grid[headerIdx+1]||[]) : [];
+  const colMat=[]; let carry=null;
+  for(let c=0;c<width;c++){
+    const top=(h1[c]||"").trim(); if(top) carry=top;   // 记住合并父列（材料大类）名
+    const sub=(h2[c]||"").trim();
+    colMat[c] = matchMat(carry)? carry : (matchMat(sub)? sub : (carry||sub));
+  }
+  const consKg = consRow ? /kg|千克|公斤/.test(consRow[0]||"") : false;
+  const inKg   = inRow ? /kg|千克|公斤/.test(inRow[0]||"") : false;
+  const byMat={}, unmatched=new Set();
+  for(let c=1;c<width;c++){
+    const mid=matchMat(colMat[c]);
+    if(!mid){ if(colMat[c]&&!/品种|规格/.test(colMat[c])) unmatched.add(colMat[c]); continue; }
+    byMat[mid]=byMat[mid]||{cons:0,inbound:0,_c:false,_i:false};
+    if(consRow){ const v=parseNum(consRow[c]); if(v!=null){ byMat[mid].cons+=consKg?v/1000:v; byMat[mid]._c=true; } }
+    if(inRow){   const v=parseNum(inRow[c]);   if(v!=null){ byMat[mid].inbound+=inKg?v/1000:v; byMat[mid]._i=true; } }
+  }
+  Object.values(byMat).forEach(o=>{ if(!o._c)o.cons=null; if(!o._i)o.inbound=null; });
+  const note = (consRow?'':"⚠ 未找到「电脑消耗」行；") + (inRow?'':"⚠ 未找到「进厂」行；")
+    + `识别材料表头第 ${headerIdx+1} 行。请务必核对下方数字。`;
+  return {byMat,unmatched:[...unmatched],note};
+}
+function matchMat(label){
+  if(!label) return null; const s=String(label).replace(/\s/g,"");
+  for(const m of state.materials){
+    if(s.includes(m.name)||m.name.includes(s)) return m.id;
+    for(const a of (m.aliases||[])){ if(a&&(s.includes(a)||a.includes(s))) return m.id; }
+  }
+  return null;
+}
+function parseNum(x){ if(x==null) return null; let s=String(x).trim().replace(/,/g,"");
+  const neg=/^\(.*\)$/.test(s); s=s.replace(/[()（）]/g,""); if(s===""||isNaN(+s)) return null; return neg? -Math.abs(+s):+s; }
 
 /* ---------- 库存盘点 ---------- */
 function viewCount(){
-  const rows = [...state.counts].sort((a,b)=>a.date<b.date?1:-1).map(c=>{
-    const m = mat(c.materialId)||{name:'?'};
-    // 账面（截止盘点日）= 期初 + 进货 − 理论消耗（从上一盘点/期初起）
-    const book = bookAt(c.materialId, c.date, c.id);
-    const diff = (+c.actual) - book;
-    const cls = diff>0.001?'neg':diff<-0.001?'pos':'';
-    return `<tr>
-      <td class="l">${c.date}</td>
-      <td class="l"><span class="mat-dot" style="background:${m.color}"></span> ${m.name}</td>
-      <td class="num">${fmt(book)}</td>
-      <td class="num"><b>${fmt(c.actual)}</b></td>
-      <td class="num ${cls}">${diff>0?'+':''}${fmt(diff)}</td>
-      <td class="l muted">${esc(c.note||'')}</td>
-      <td><div class="row-actions">
-        <button class="btn ghost sm" onclick="editCount('${c.id}')">改</button>
-        <button class="btn danger sm" onclick="del('counts','${c.id}')">删</button>
-      </div></td></tr>`;
-  }).join("");
-  return `
-  <div class="card">
-    <h2>库存盘点</h2>
-    <div class="sub">录入实际过磅/测量的库存，系统对比账面差异。<b>盘点越勤，损耗发现越准。</b>差额为负=实盘少于账面（疑似损耗）。</div>
+  const rows=[...state.counts].sort((a,b)=>a.date<b.date?1:-1).map(c=>{
+    const m=mat(c.materialId)||{name:'?'}; const book=bookAt(c.materialId,c.date,c.id); const diff=(+c.actual)-book;
+    const cls=diff>0.001?'neg':diff<-0.001?'pos':'';
+    return `<tr><td class="l">${c.date}</td><td class="l"><span class="mat-dot"></span>${m.name}</td>
+      <td class="num">${fmt(book)}</td><td class="num"><b>${fmt(c.actual)}</b></td>
+      <td class="num ${cls}">${diff>0?'+':''}${fmt(diff)}</td><td class="l muted">${esc(c.note||'')}</td>
+      <td><div class="row-actions"><button class="btn ghost sm" onclick="editCount('${c.id}')">改</button>
+        <button class="btn danger sm" onclick="del('counts','${c.id}')">删</button></div></td></tr>`;}).join("");
+  return `<div class="card"><h2>库存盘点</h2>
+    <div class="sub">录入实际过磅/测量的库存，系统对比账面差异。<b>盘点越勤，损耗发现越准。</b>差额为负=实盘少于账面（疑似损耗）。盘点后即成为后续账面的新基准。</div>
     <div class="toolbar"><button class="btn" onclick="editCount()">＋ 新增盘点</button></div>
-    <div class="tablewrap">
-    ${state.counts.length? `<table>
+    <div class="tablewrap">${state.counts.length?`<table>
       <thead><tr><th class="l">日期</th><th class="l">材料</th><th>账面库存</th><th>实盘库存</th><th>盈亏</th><th class="l">备注</th><th></th></tr></thead>
-      <tbody>${rows}</tbody></table>` : `<div class="empty">还没有盘点记录。做一次盘点，就能启动损耗分析。</div>`}
-    </div>
-  </div>`;
+      <tbody>${rows}</tbody></table>`:`<div class="empty">还没有盘点记录。做一次盘点，就能启动损耗分析。</div>`}</div></div>`;
 }
-// 截止某日的账面（排除指定盘点id自身，用于盘点表对比）
-function bookAt(materialId, date, excludeCountId){
-  const prevCounts = state.counts.filter(c=>c.materialId===materialId && c.id!==excludeCountId && c.date<date)
-    .sort((a,b)=> a.date<b.date?1:-1);
-  let baseVal, from;
-  if(prevCounts.length){ baseVal=+prevCounts[0].actual; from=dayAfter(prevCounts[0].date); }
-  else { baseVal=mat(materialId).opening||0; from=null; }
-  return baseVal + purchasedSum(materialId, from, date) - theoreticalUse(materialId, from, date);
+function bookAt(mid,date,excludeId){
+  const prev=state.counts.filter(c=>c.materialId===mid&&c.id!==excludeId&&c.date<date).sort((a,b)=>a.date<b.date?1:-1);
+  let base,from; if(prev.length){base=+prev[0].actual;from=dayAfter(prev[0].date);} else {base=+(mat(mid).opening||0);from=null;}
+  return base + sumDaily(mid,"inbound",from,date) - sumDaily(mid,"cons",from,date);
 }
 
-/* ---------- 损耗分析（核心） ---------- */
+/* ---------- 损耗分析 ---------- */
 function viewLoss(){
-  const dates = [...state.purchases,...state.productions,...state.counts].map(x=>x.date).sort();
-  const from = dates[0]||today(), to=today();
-  return `
-  <div class="card">
-    <h2>🔍 损耗分析 · 理论 vs 实际</h2>
-    <div class="sub">实际消耗 = 期初 + 进货 − 期末实盘；损耗 = 实际消耗 − 理论消耗（配比×方量）。超过阈值即预警。</div>
-    <div class="hint">
-      口径说明：期初取区间开始前最近一次盘点（无则取“材料设置”里的期初）；期末取区间内最近一次盘点。
-      <b>没有盘点就无法得出实际消耗</b>——请到「库存盘点」先录入一次实盘。
-    </div>
+  const ds=[...state.daily,...state.counts].map(x=>x.date).sort();
+  return `<div class="card"><h2>🔍 损耗分析 · 电脑消耗 vs 实际</h2>
+    <div class="sub">实际消耗 = 期初 + 进厂 − 期末实盘；损耗 = 实际消耗 − 电脑消耗（理论应耗）。超阈值或账面倒挂即预警。</div>
+    <div class="hint">口径：期初取区间开始前最近一次盘点（无则材料期初）；期末取区间内最近一次盘点。<b>没有盘点就得不出实际消耗</b>——请先到「库存盘点」录一次实盘。</div>
     <div class="toolbar">
-      <label class="field" style="max-width:170px"><span>开始日期</span><input type="date" id="lossFrom" value="${from}"></label>
-      <label class="field" style="max-width:170px"><span>结束日期</span><input type="date" id="lossTo" value="${to}"></label>
+      <label class="field" style="max-width:170px"><span>开始日期</span><input type="date" id="lossFrom" value="${ds[0]||today()}"></label>
+      <label class="field" style="max-width:170px"><span>结束日期</span><input type="date" id="lossTo" value="${today()}"></label>
       <button class="btn" onclick="runLoss()">分析</button>
-      <div class="spacer"></div>
-      <button class="btn ghost sm" onclick="window.print()">打印报表</button>
-    </div>
-    <div id="lossResult"></div>
-  </div>`;
+      <div class="spacer"></div><button class="btn ghost sm" onclick="print()">打印报表</button>
+    </div><div id="lossResult"></div></div>`;
 }
 function after_loss(){ runLoss(); }
 function runLoss(){
-  const from = document.getElementById("lossFrom").value || null;
-  const to   = document.getElementById("lossTo").value || null;
-  const data = lossAnalysis(from, to);
-  const anyData = data.some(d=>d.status!=="nodata");
-  const rows = data.map(d=>{
-    const st = {
-      ok:  `<span class="tag ok">正常</span>`,
-      over:`<span class="tag bad">超耗预警</span>`,
-      under:`<span class="tag warn">异常偏少</span>`,
-      nodata:`<span class="tag mut">缺盘点</span>`
-    }[d.status];
-    const rateTxt = d.rate==null? '—' : (Math.abs(d.rate)===Infinity? '∞' : (d.rate>0?'+':'')+fmt(d.rate,1)+'%');
-    const lossCls = d.loss==null?'':d.loss>0?'pos':'neg';
-    return `<tr>
-      <td class="l"><span class="mat-dot" style="background:${d.m.color}"></span> ${d.m.name}</td>
-      <td class="num">${fmt(d.opening.value)}<div class="muted" style="font-size:11px">${d.opening.source}</div></td>
-      <td class="num">${fmt(d.purchased)}</td>
-      <td class="num">${fmt(d.theo)}</td>
-      <td class="num">${d.endCount?fmt(d.endCount.actual):'<span class="muted">无</span>'}</td>
+  const from=document.getElementById("lossFrom").value||null, to=document.getElementById("lossTo").value||null;
+  const data=lossAnalysis(from,to); const any=data.some(d=>d.status!=="nodata");
+  const rows=data.map(d=>{
+    const st={ok:'<span class="tag ok">正常</span>',over:'<span class="tag bad">超耗预警</span>',
+      under:'<span class="tag warn">异常偏少</span>',nodata:'<span class="tag mut">缺盘点</span>'}[d.status];
+    const rt=d.rate==null?'—':(Math.abs(d.rate)===Infinity?'∞':(d.rate>0?'+':'')+fmt(d.rate,1)+'%');
+    const lc=d.loss==null?'':d.loss>0?'pos':'neg';
+    const negBook=d.book<-0.001?' <span class="tag bad" style="font-size:11px">倒挂</span>':'';
+    return `<tr><td class="l"><span class="mat-dot"></span>${d.m.name}</td>
+      <td class="num">${fmt(d.open.value)}<div class="muted" style="font-size:11px">${d.open.source}</div></td>
+      <td class="num">${fmt(d.inbound)}</td><td class="num">${fmt(d.cons)}</td>
+      <td class="num">${d.endCount?fmt(d.endCount.actual):'<span class="muted">无</span>'}${negBook}</td>
       <td class="num">${d.actualUse==null?'—':fmt(d.actualUse)}</td>
-      <td class="num ${lossCls}"><b>${d.loss==null?'—':(d.loss>0?'+':'')+fmt(d.loss)}</b></td>
-      <td class="num ${lossCls}">${rateTxt}</td>
-      <td class="num muted">${fmt(d.m.lossThreshold,1)}%</td>
-      <td>${st}</td>
-    </tr>`;
-  }).join("");
-
-  const alerts = data.filter(d=>d.status==="over"||d.status==="under");
-  const alertBox = alerts.length? `<div class="hint" style="border-color:var(--bad);color:var(--txt)">
-     <b style="color:var(--bad)">⚠ 发现 ${alerts.length} 项异常损耗：</b>
-     ${alerts.map(d=>`${d.m.name}（${d.status==='over'?'超耗':'偏少'} ${d.rate>0?'+':''}${Math.abs(d.rate)===Infinity?'∞':fmt(d.rate,1)}%，${d.loss>0?'多耗':'少耗'} ${fmt(Math.abs(d.loss))}${d.m.unit}）`).join("；")}。
-     <br>超耗常见原因：过磅作弊、装载/皮带跑冒、雨天砂含水虚增、配料机计量偏差、盗料；偏少可能是进货虚报或配比给料不足。建议核查过磅记录与计量设备。
-   </div>`:'';
-
-  document.getElementById("lossResult").innerHTML = `
-    ${alertBox}
-    <div class="tablewrap">
-    ${anyData? `<table>
-      <thead><tr><th class="l">材料</th><th>期初</th><th>进货</th><th>理论消耗</th><th>期末实盘</th><th>实际消耗</th><th>损耗</th><th>损耗率</th><th>阈值</th><th>状态</th></tr></thead>
-      <tbody>${rows}</tbody></table>`
-    : `<div class="empty">当前区间没有盘点数据，无法计算实际消耗。<br>请先到「库存盘点」录入一次实盘。</div>`}
-    </div>
-    <div class="legend">
-      <span><i style="background:var(--bad)"></i>损耗为正 = 实际比理论多耗（疑似跑冒滴漏）</span>
-      <span><i style="background:var(--ok)"></i>损耗为负 = 比理论少耗</span>
-    </div>`;
+      <td class="num ${lc}"><b>${d.loss==null?'—':(d.loss>0?'+':'')+fmt(d.loss)}</b></td>
+      <td class="num ${lc}">${rt}</td><td class="num muted">${fmt(d.m.lossThreshold,1)}%</td><td>${st}</td></tr>`;}).join("");
+  const alerts=data.filter(d=>d.status==="over"||d.status==="under");
+  const box=alerts.length?`<div class="hint" style="border-color:var(--bad);color:var(--txt)">
+    <b style="color:var(--bad)">⚠ 发现 ${alerts.length} 项异常损耗：</b>
+    ${alerts.map(d=>`${d.m.name}（${d.status==='over'?'超耗':'偏少'} ${Math.abs(d.rate)===Infinity?'∞':(d.rate>0?'+':'')+fmt(d.rate,1)+'%'}，${d.loss>0?'多耗':'少耗'} ${fmt(Math.abs(d.loss))}吨）`).join('；')}。
+    <br>超耗常见原因：过磅作弊、装载/皮带跑冒、雨天砂含水虚增、配料机计量偏差、盗料；偏少多为进厂虚报或配比给料不足。建议核查过磅记录与主机计量。</div>`:'';
+  document.getElementById("lossResult").innerHTML=`${box}<div class="tablewrap">${any?`<table>
+    <thead><tr><th class="l">材料</th><th>期初</th><th>进厂</th><th>电脑消耗</th><th>期末实盘</th><th>实际消耗</th><th>损耗</th><th>损耗率</th><th>阈值</th><th>状态</th></tr></thead>
+    <tbody>${rows}</tbody></table>`:`<div class="empty">当前区间没有盘点数据，无法计算实际消耗。请先到「库存盘点」录入一次实盘。</div>`}</div>
+    <div class="legend"><span><i style="background:var(--bad)"></i>损耗为正 = 实际比理论多耗（疑似跑冒滴漏）</span><span><i style="background:var(--ok)"></i>损耗为负 = 比理论少耗</span></div>`;
 }
 
 /* ---------- 材料设置 ---------- */
 function viewMats(){
-  const rows = state.materials.map(m=>`<tr>
-    <td class="l"><span class="mat-dot" style="background:${m.color}"></span> ${m.name}</td>
-    <td class="l">${m.unit}</td>
-    <td class="num">${fmt(m.opening)}</td>
-    <td class="num">${fmt0(m.warnLow)}</td>
-    <td class="num">${fmt(m.lossThreshold,1)}%</td>
-    <td><div class="row-actions">
-      <button class="btn ghost sm" onclick="editMat('${m.id}')">改</button>
-      <button class="btn danger sm" onclick="del('materials','${m.id}')">删</button>
-    </div></td></tr>`).join("");
-  return `
-  <div class="card">
-    <h2>材料设置</h2>
-    <div class="sub">期初库存=系统启用时的现有库存；安全库存=低于则告警；损耗率阈值=损耗分析的预警线（各材料正常损耗不同）。</div>
-    <div class="toolbar">
-      <button class="btn" onclick="editMat()">＋ 新增材料</button>
+  const rows=state.materials.map(m=>`<tr><td class="l"><span class="mat-dot"></span>${m.name}</td>
+    <td class="num">${fmt(m.opening)}</td><td class="num">${fmt0(m.warnLow)}</td><td class="num">${fmt(m.lossThreshold,1)}%</td>
+    <td class="l muted" style="white-space:normal;max-width:260px">${esc((m.aliases||[]).join('、'))}</td>
+    <td><div class="row-actions"><button class="btn ghost sm" onclick="editMat('${m.id}')">改</button>
+      <button class="btn danger sm" onclick="del('materials','${m.id}')">删</button></div></td></tr>`).join("");
+  return `<div class="card"><h2>材料设置</h2>
+    <div class="sub">期初库存=启用系统时的现有库存；安全库存=低于则告警；损耗阈值=损耗分析预警线；别名=粘贴导入时把原始列名归到本大类。</div>
+    <div class="toolbar"><button class="btn" onclick="editMat()">＋ 新增材料</button>
       <button class="btn ghost sm" onclick="editPlant()">修改站名</button>
-      <div class="spacer"></div>
-      <button class="btn danger sm" onclick="wipe()">清空全部数据</button>
-    </div>
-    <div class="tablewrap"><table>
-      <thead><tr><th class="l">材料</th><th class="l">单位</th><th>期初库存</th><th>安全库存</th><th>损耗阈值</th><th></th></tr></thead>
-      <tbody>${rows}</tbody></table></div>
-  </div>`;
+      <div class="spacer"></div><button class="btn danger sm" onclick="wipe()">清空全部数据</button></div>
+    <div class="tablewrap"><table><thead><tr><th class="l">材料（大类）</th><th>期初库存</th><th>安全库存</th><th>损耗阈值</th><th class="l">导入别名</th><th></th></tr></thead>
+      <tbody>${rows}</tbody></table></div></div>`;
 }
 
-/* ================= 表单弹窗 ================= */
-function openDlg(title, bodyHTML, onSave){
-  document.getElementById("dlgTitle").textContent = title;
-  document.getElementById("dlgBody").innerHTML = bodyHTML;
-  const dlg = document.getElementById("dlg");
-  const btn = document.getElementById("dlgSave");
-  const fresh = btn.cloneNode(true); btn.parentNode.replaceChild(fresh,btn);
+/* ================= 弹窗 & 增删 ================= */
+function openDlg(title,html,onSave){
+  document.getElementById("dlgTitle").textContent=title;
+  document.getElementById("dlgBody").innerHTML=html;
+  const dlg=document.getElementById("dlg"), btn=document.getElementById("dlgSave");
+  const fresh=btn.cloneNode(true); btn.parentNode.replaceChild(fresh,btn);
   fresh.addEventListener("click",()=>{ if(onSave()!==false){ dlg.close(); save(); render(); } });
-  dlg.showModal();
-  const first = dlg.querySelector("input,select,textarea"); if(first) first.focus();
+  dlg.showModal(); const f=dlg.querySelector("input,textarea,select"); if(f)f.focus();
 }
-const gv = id => document.getElementById(id).value.trim();
-const gvn = id => { const v=document.getElementById(id).value; return v===""?null:+v; };
-
+const gv=id=>document.getElementById(id).value.trim();
 function matOptions(sel){ return state.materials.map(m=>`<option value="${m.id}" ${m.id===sel?'selected':''}>${m.name}</option>`).join(""); }
 
-/* 进货过磅 */
-function editBuy(id){
-  const p = id? state.purchases.find(x=>x.id===id) : {date:today(),materialId:state.materials[0]?.id};
-  openDlg(id?"编辑过磅单":"新增过磅单", `
-    <div class="form-row">
-      <label class="field"><span>日期 <b>*</b></span><input type="date" id="f_date" value="${p.date||today()}"></label>
-      <label class="field"><span>材料 <b>*</b></span><select id="f_mat">${matOptions(p.materialId)}</select></label>
-      <label class="field"><span>供应商</span><input id="f_sup" value="${esc(p.supplier||'')}"></label>
-      <label class="field"><span>车号</span><input id="f_veh" value="${esc(p.vehicle||'')}"></label>
-      <label class="field"><span>毛重 (吨)</span><input type="number" step="0.01" id="f_gross" value="${p.gross??''}" oninput="calcNet()"></label>
-      <label class="field"><span>皮重 (吨)</span><input type="number" step="0.01" id="f_tare" value="${p.tare??''}" oninput="calcNet()"></label>
-      <label class="field"><span>净重 (吨) <b>*</b></span><input type="number" step="0.01" id="f_net" value="${p.net??''}" oninput="calcAmt()"></label>
-      <label class="field"><span>单价 (元/吨)</span><input type="number" step="0.01" id="f_price" value="${p.price??''}" oninput="calcAmt()"></label>
-      <label class="field"><span>金额 (元)</span><input type="number" step="0.01" id="f_amt" value="${p.amount??''}"></label>
-      <label class="field" style="grid-column:1/-1"><span>备注</span><input id="f_note" value="${esc(p.note||'')}"></label>
-    </div>`, ()=>{
-      const net = gvn("f_net");
-      if(net==null||isNaN(net)){ toast("请填写净重"); return false; }
-      const obj={ id:id||uid(), date:gv("f_date"), materialId:gv("f_mat"), supplier:gv("f_sup"),
-        vehicle:gv("f_veh"), gross:gvn("f_gross"), tare:gvn("f_tare"), net, price:gvn("f_price"), amount:gvn("f_amt"), note:gv("f_note") };
-      upsert("purchases",obj); toast("已保存过磅单");
-  });
-}
-function calcNet(){ const g=gvn("f_gross"),t=gvn("f_tare"); if(g!=null&&t!=null){ document.getElementById("f_net").value=(g-t).toFixed(2); calcAmt(); } }
-function calcAmt(){ const n=gvn("f_net"),p=gvn("f_price"); if(n!=null&&p!=null) document.getElementById("f_amt").value=(n*p).toFixed(2); }
-
-/* 配比 */
-function editMix(id){
-  const mx = id? state.mixes.find(x=>x.id===id) : {ratios:{}};
-  const ratioInputs = state.materials.map(m=>`
-    <label class="field"><span><span class="mat-dot" style="background:${m.color}"></span> ${m.name} (kg/m³)</span>
-      <input type="number" step="0.1" id="r_${m.id}" value="${(mx.ratios&&mx.ratios[m.id])??''}"></label>`).join("");
-  openDlg(id?"编辑配比":"新增配比", `
-    <div class="form-row">
-      <label class="field"><span>标号 <b>*</b></span><input id="f_grade" placeholder="C30" value="${esc(mx.grade||'')}"></label>
-      <label class="field"><span>方案名称</span><input id="f_mname" placeholder="C30泵送" value="${esc(mx.name||'')}"></label>
-    </div>
-    <div class="form-row" style="margin-top:12px">${ratioInputs}</div>
-    <label class="field" style="margin-top:12px"><span>备注（水灰比 / 坍落度等）</span><input id="f_mnote" value="${esc(mx.note||'')}"></label>
-  `, ()=>{
-    const grade=gv("f_grade"); if(!grade){ toast("请填写标号"); return false; }
-    const ratios={}; state.materials.forEach(m=>{ const v=gvn("r_"+m.id); if(v!=null&&v>0) ratios[m.id]=v; });
-    upsert("mixes",{ id:id||uid(), grade, name:gv("f_mname"), ratios, note:gv("f_mnote") }); toast("配比已保存");
-  });
-}
-
-/* 生产领用 */
-function editProd(id){
-  const pr = id? state.productions.find(x=>x.id===id) : {date:today(),mixId:state.mixes[0]?.id};
-  const opts = state.mixes.map(m=>`<option value="${m.id}" ${m.id===pr.mixId?'selected':''}>${m.grade||''} ${m.name||''}</option>`).join("");
-  openDlg(id?"编辑生产记录":"新增生产记录", `
-    <div class="form-row">
-      <label class="field"><span>日期 <b>*</b></span><input type="date" id="f_date" value="${pr.date||today()}"></label>
-      <label class="field"><span>配比 <b>*</b></span><select id="f_mix" onchange="prodPreview()">${opts}</select></label>
-      <label class="field"><span>生产方量 (m³) <b>*</b></span><input type="number" step="0.1" id="f_vol" value="${pr.volume??''}" oninput="prodPreview()"></label>
-      <label class="field" style="grid-column:1/-1"><span>备注</span><input id="f_note" value="${esc(pr.note||'')}"></label>
-    </div>
-    <div id="prodPrev" class="hint" style="margin-top:12px"></div>
-  `, ()=>{
-    const vol=gvn("f_vol"); if(vol==null||vol<=0){ toast("请填写生产方量"); return false; }
-    upsert("productions",{ id:id||uid(), date:gv("f_date"), mixId:gv("f_mix"), volume:vol, note:gv("f_note") }); toast("生产记录已保存");
-  });
-  prodPreview();
-}
-function prodPreview(){
-  const mx = state.mixes.find(m=>m.id===gv("f_mix")); const vol=gvn("f_vol")||0;
-  if(!mx){ document.getElementById("prodPrev").textContent="—"; return; }
-  const items = state.materials.map(m=>{ const kg=((mx.ratios&&mx.ratios[m.id])||0)*vol; return kg? `${m.name} ${fmt(kg/T,2)}t`:null; }).filter(Boolean);
-  document.getElementById("prodPrev").innerHTML = "理论消耗预览： " + (items.length? items.join("， "):"（该配比未设用量）");
-}
-
-/* 盘点 */
 function editCount(id){
-  const c = id? state.counts.find(x=>x.id===id) : {date:today(),materialId:state.materials[0]?.id};
-  openDlg(id?"编辑盘点":"新增盘点", `
-    <div class="form-row">
-      <label class="field"><span>日期 <b>*</b></span><input type="date" id="f_date" value="${c.date||today()}"></label>
-      <label class="field"><span>材料 <b>*</b></span><select id="f_mat" onchange="countPreview()">${matOptions(c.materialId)}</select></label>
-      <label class="field"><span>实盘库存 (吨) <b>*</b></span><input type="number" step="0.01" id="f_act" value="${c.actual??''}"></label>
-      <label class="field" style="grid-column:1/-1"><span>备注</span><input id="f_note" value="${esc(c.note||'')}"></label>
-    </div>
-    <div id="countPrev" class="hint" style="margin-top:12px"></div>
-  `, ()=>{
-    const act=gvn("f_act"); if(act==null){ toast("请填写实盘库存"); return false; }
-    upsert("counts",{ id:id||uid(), date:gv("f_date"), materialId:gv("f_mat"), actual:act, note:gv("f_note") }); toast("盘点已保存");
-  });
-  countPreview();
+  const c=id?state.counts.find(x=>x.id===id):{date:today(),materialId:state.materials[0]?.id};
+  openDlg(id?"编辑盘点":"新增盘点",`<div class="form-row">
+    <label class="field"><span>日期 <b>*</b></span><input type="date" id="f_date" value="${c.date||today()}"></label>
+    <label class="field"><span>材料 <b>*</b></span><select id="f_mat" onchange="countPrev()">${matOptions(c.materialId)}</select></label>
+    <label class="field"><span>实盘库存 (吨) <b>*</b></span><input type="number" step="0.01" id="f_act" value="${c.actual??''}"></label>
+    <label class="field" style="grid-column:1/-1"><span>备注</span><input id="f_note" value="${esc(c.note||'')}"></label>
+    </div><div id="cPrev" class="hint" style="margin-top:12px"></div>`,()=>{
+      const a=numv("f_act"); if(a==null){toast("请填写实盘库存");return false;}
+      upsert("counts",{id:id||uid(),date:gv("f_date"),materialId:gv("f_mat"),actual:a,note:gv("f_note")}); toast("盘点已保存");
+  }); countPrev();
 }
-function countPreview(){
-  const mid=gv("f_mat"), d=gv("f_date")||today();
-  const book=bookAt(mid,d,null);
-  document.getElementById("countPrev").innerHTML = `截止 ${d} 账面库存约 <b>${fmt(book)}</b> ${mat(mid).unit}，请填入实测值以对比。`;
-}
+function countPrev(){ const mid=gv("f_mat"),d=gv("f_date")||today();
+  document.getElementById("cPrev").innerHTML=`截止 ${d} 账面库存约 <b>${fmt(bookAt(mid,d,null))}</b> 吨，请填入实测值对比。`; }
 
-/* 材料 */
 function editMat(id){
-  const m = id? mat(id) : {unit:"吨",color:"var(--accent)",opening:0,warnLow:0,lossThreshold:2};
-  openDlg(id?"编辑材料":"新增材料", `
-    <div class="form-row">
-      <label class="field"><span>名称 <b>*</b></span><input id="f_name" value="${esc(m.name||'')}"></label>
-      <label class="field"><span>单位</span><input id="f_unit" value="${esc(m.unit||'吨')}"></label>
-      <label class="field"><span>期初库存</span><input type="number" step="0.01" id="f_open" value="${m.opening??0}"></label>
-      <label class="field"><span>安全库存</span><input type="number" step="0.01" id="f_warn" value="${m.warnLow??0}"></label>
-      <label class="field"><span>损耗率阈值 (%)</span><input type="number" step="0.1" id="f_loss" value="${m.lossThreshold??2}"></label>
-      <label class="field"><span>颜色</span><input id="f_color" value="${esc(m.color||'var(--accent)')}"></label>
-    </div>`, ()=>{
-    const name=gv("f_name"); if(!name){ toast("请填写名称"); return false; }
-    const obj={ id:id||("m_"+uid()), name, unit:gv("f_unit")||"吨", color:gv("f_color")||"var(--accent)",
-      opening:gvn("f_open")||0, warnLow:gvn("f_warn")||0, lossThreshold:gvn("f_loss")||0 };
-    upsert("materials",obj); toast("材料已保存");
+  const m=id?mat(id):{opening:0,warnLow:0,lossThreshold:2,aliases:[]};
+  openDlg(id?"编辑材料":"新增材料",`<div class="form-row">
+    <label class="field"><span>名称 <b>*</b></span><input id="f_name" value="${esc(m.name||'')}"></label>
+    <label class="field"><span>期初库存 (吨)</span><input type="number" step="0.01" id="f_open" value="${m.opening??0}"></label>
+    <label class="field"><span>安全库存 (吨)</span><input type="number" step="0.01" id="f_warn" value="${m.warnLow??0}"></label>
+    <label class="field"><span>损耗率阈值 (%)</span><input type="number" step="0.1" id="f_loss" value="${m.lossThreshold??2}"></label>
+    <label class="field" style="grid-column:1/-1"><span>导入别名（顿号/逗号分隔，如：1线水泥、聚羧酸）</span><input id="f_alias" value="${esc((m.aliases||[]).join('、'))}"></label>
+    </div>`,()=>{
+      const name=gv("f_name"); if(!name){toast("请填写名称");return false;}
+      const aliases=gv("f_alias").split(/[、,，]/).map(s=>s.trim()).filter(Boolean);
+      upsert("materials",{id:id||("m_"+uid()),name,opening:numv("f_open")||0,warnLow:numv("f_warn")||0,lossThreshold:numv("f_loss")||0,aliases}); toast("材料已保存");
   });
 }
-function editPlant(){
-  openDlg("修改站名", `<label class="field"><span>搅拌站名称</span><input id="f_pn" value="${esc(state.plantName)}"></label>`, ()=>{
-    state.plantName = gv("f_pn")||"未命名搅拌站"; toast("已更新");
-  });
-}
+function editPlant(){ openDlg("修改站名",`<label class="field"><span>搅拌站名称</span><input id="f_pn" value="${esc(state.plantName)}"></label>`,()=>{ state.plantName=gv("f_pn")||"未命名搅拌站"; toast("已更新"); }); }
 
-/* ================= 通用增删 ================= */
-function upsert(coll, obj){
-  const arr = state[coll]; const i = arr.findIndex(x=>x.id===obj.id);
-  if(i>=0) arr[i]=obj; else arr.push(obj);
-}
-function del(coll, id){
-  if(!confirm("确定删除这条记录？删除后不可恢复。")) return;
-  state[coll] = state[coll].filter(x=>x.id!==id); save(); render(); toast("已删除");
-}
-function wipe(){
-  if(!confirm("将清空所有材料、进货、配比、生产、盘点数据，无法恢复。确定？")) return;
-  if(!confirm("再次确认：彻底清空？")) return;
-  localStorage.removeItem(LS_KEY); state=normalize({}); save(); render(); toast("已清空");
-}
+function upsert(coll,obj){ const a=state[coll],i=a.findIndex(x=>x.id===obj.id); if(i>=0)a[i]=obj; else a.push(obj); }
+function del(coll,id){ if(!confirm("确定删除这条记录？")) return; state[coll]=state[coll].filter(x=>x.id!==id); save(); render(); toast("已删除"); }
+function wipe(){ if(!confirm("将清空全部数据，无法恢复。确定？"))return; if(!confirm("再次确认：彻底清空？"))return;
+  localStorage.removeItem(LS_KEY); state=normalize({}); save(); render(); toast("已清空"); }
 
-/* ================= 导入导出 / 示例 ================= */
-function exportBackup(){
-  const blob = new Blob([JSON.stringify(state,null,2)],{type:"application/json"});
-  download(blob, `进销存备份_${today()}.json`); toast("已导出备份");
-}
-function importBackup(input){
-  const f=input.files[0]; if(!f) return;
-  const r=new FileReader();
-  r.onload=()=>{ try{ state=normalize(JSON.parse(r.result)); save(); render(); toast("导入成功"); }
-    catch(e){ alert("文件格式错误，导入失败"); } input.value=""; };
-  r.readAsText(f);
-}
-function exportCSV(coll){
-  let header, rows;
-  if(coll==="purchases"){
-    header=["日期","材料","供应商","车号","毛重","皮重","净重","单价","金额","备注"];
-    rows=state.purchases.map(p=>[p.date,mat(p.materialId)?.name||'',p.supplier||'',p.vehicle||'',p.gross??'',p.tare??'',p.net??'',p.price??'',p.amount??'',p.note||'']);
-  }else if(coll==="productions"){
-    header=["日期","配比","方量"];
-    rows=state.productions.map(pr=>{const m=state.mixes.find(x=>x.id===pr.mixId);return [pr.date,(m?.grade||'')+' '+(m?.name||''),pr.volume??''];});
-  }
+/* ================= 备份 / CSV / 示例 ================= */
+function exportBackup(){ download(new Blob([JSON.stringify(state,null,2)],{type:"application/json"}),`进销存备份_${today()}.json`); toast("已导出备份"); }
+function importBackup(inp){ const f=inp.files[0]; if(!f)return; const r=new FileReader();
+  r.onload=()=>{ try{state=normalize(JSON.parse(r.result));save();render();toast("恢复成功");}catch(e){alert("文件格式错误");} inp.value=""; }; r.readAsText(f); }
+function exportDailyCSV(){
+  const header=["日期","材料","电脑消耗(吨)","进厂(吨)"];
+  const rows=[...state.daily].sort((a,b)=>a.date<b.date?1:-1).map(r=>[r.date,mat(r.materialId)?.name||'',r.cons??'',r.inbound??'']);
   const csv=[header,...rows].map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(",")).join("\r\n");
-  download(new Blob(["﻿"+csv],{type:"text/csv"}), `${coll}_${today()}.csv`); toast("已导出CSV");
+  download(new Blob(["﻿"+csv],{type:"text/csv"}),`日报_${today()}.csv`); toast("已导出CSV");
 }
 function download(blob,name){ const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=name; a.click(); URL.revokeObjectURL(a.href); }
 
 function loadDemo(){
-  if(state.purchases.length||state.productions.length){ if(!confirm("载入示例数据将与现有数据合并（材料期初会被示例覆盖）。继续？")) return; }
-  const d=(off)=>{ const x=new Date(); x.setDate(x.getDate()-off); return x.toISOString().slice(0,10); };
-  state.materials = structuredClone(DEFAULT_MATERIALS).map(m=>({...m, opening:{sand:800,stone:1000,cement:300,flyash:150,admix:12}[m.id]||0}));
-  state.mixes=[
-    {id:"mixC30",grade:"C30",name:"C30泵送",ratios:{sand:760,stone:1050,cement:280,flyash:80,admix:6.5},note:"水灰比0.45，坍落度180±20"},
-    {id:"mixC25",grade:"C25",name:"C25泵送",ratios:{sand:790,stone:1040,cement:250,flyash:70,admix:5.8},note:""},
-  ];
-  state.purchases=[
-    {id:uid(),date:d(20),materialId:"sand",supplier:"金河砂场",vehicle:"豫A·8827",gross:52.3,tare:12.1,net:40.2,price:95,amount:3819,note:""},
-    {id:uid(),date:d(18),materialId:"stone",supplier:"宏基石料",vehicle:"豫A·1156",gross:55.0,tare:13.0,net:42.0,price:110,amount:4620,note:""},
-    {id:uid(),date:d(15),materialId:"cement",supplier:"中联水泥",vehicle:"罐车A",gross:0,tare:0,net:60.0,price:420,amount:25200,note:"散装入罐"},
-    {id:uid(),date:d(12),materialId:"flyash",supplier:"电厂粉煤灰",vehicle:"罐车B",gross:0,tare:0,net:30.0,price:180,amount:5400,note:""},
-    {id:uid(),date:d(10),materialId:"admix",supplier:"科之杰",vehicle:"槽车",gross:0,tare:0,net:5.0,price:1800,amount:9000,note:"聚羧酸"},
-    {id:uid(),date:d(8),materialId:"sand",supplier:"金河砂场",vehicle:"豫A·8827",gross:51.0,tare:12.1,net:38.9,price:95,amount:3695.5,note:""},
-  ];
-  state.productions=[
-    {id:uid(),date:d(14),mixId:"mixC30",volume:120,note:"某工地"},
-    {id:uid(),date:d(11),mixId:"mixC25",volume:90,note:""},
-    {id:uid(),date:d(6),mixId:"mixC30",volume:150,note:""},
-  ];
-  // 期末盘点：砂故意偏少（模拟跑冒滴漏 ~12%），其余材料损耗在正常范围内
-  state.counts=[
-    {id:uid(),date:d(1),materialId:"sand",actual:568,note:"月末盘点：实盘明显偏少，疑似皮带撒漏/含水虚增"},
-    {id:uid(),date:d(1),materialId:"stone",actual:659,note:""},
-    {id:uid(),date:d(1),materialId:"cement",actual:261,note:""},
-    {id:uid(),date:d(1),materialId:"flyash",actual:152,note:""},
-    {id:uid(),date:d(1),materialId:"admix",actual:14.7,note:""},
-  ];
+  if(state.daily.length&&!confirm("载入示例数据将覆盖材料期初并追加示例日报。继续？")) return;
+  const d=off=>{const x=new Date();x.setDate(x.getDate()-off);return x.toISOString().slice(0,10);};
+  state.materials=structuredClone(DEFAULT_MATERIALS).map(m=>({...m,opening:{cement:220,slag:180,flyash:150,expand:200,stpow:170,msand:2400,fsand:120,gravel:1780,pebble:56,admix:36,eadmix:6,diesel:3,urea:5}[m.id]||0}));
+  // 20天日报：电脑消耗+进厂。机制砂故意让实际>电脑消耗（跑冒滴漏），其余正常
+  state.daily=[]; state.meta=[];
+  const consBase={cement:17.6,slag:0,flyash:5.0,expand:5.0,stpow:5.6,msand:79.2,fsand:0,gravel:83.1,pebble:0.2,admix:0.42,eadmix:0,diesel:0.05,urea:0.1};
+  for(let k=19;k>=0;k--){ const date=d(k); const vol=80+Math.round(Math.random()*20);
+    state.materials.forEach(m=>{ const c=(consBase[m.id]||0)*(0.9+Math.random()*0.2);
+      const inb=(m.id==="msand"&&k%3===0)?360:(m.id==="cement"&&k%5===0)?150:(m.id==="gravel"&&k%3===1)?300:0;
+      if(c>0||inb>0) state.daily.push({id:uid(),date,materialId:m.id,cons:+c.toFixed(3),inbound:inb}); });
+    state.meta.push({id:uid(),date,volTotal:vol,volC30:Math.round(vol*0.85),sales:vol});
+  }
+  // 期末盘点：机制砂实盘明显偏少（多耗~10%，模拟跑冒滴漏），其余等于账面（损耗正常）
+  const endDate=d(0);
+  state.counts=state.materials.map(m=>{ const book=bookStock(m.id,endDate);
+    const actual = m.id==="msand"? book*0.90 : book;   // 仅机制砂制造 10% 亏空
+    return {id:uid(),date:endDate,materialId:m.id,actual:+Math.max(0,actual).toFixed(2),note:m.id==="msand"?"月末盘点：实盘明显偏少，疑似皮带撒漏/含水虚增":""}; });
   save(); render(); toast("示例数据已载入，去「损耗分析」看看");
 }
 
-/* ================= 工具 ================= */
-function esc(s){ return String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
-document.getElementById("plantName").addEventListener("click", editPlant);
-
 /* 启动 */
+document.getElementById("plantName").addEventListener("click",editPlant);
 renderTabs(); render();
 </script>
 </body>
