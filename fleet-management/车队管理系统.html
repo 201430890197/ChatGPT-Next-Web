@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>混凝土企业车队管理系统</title>
+<style>
+  :root{
+    --bg:#0f172a; --panel:#1e293b; --panel2:#273449; --line:#334155;
+    --text:#e2e8f0; --muted:#94a3b8; --brand:#2563eb; --brand2:#3b82f6;
+    --ok:#22c55e; --warn:#f59e0b; --danger:#ef4444; --info:#06b6d4;
+    --radius:12px; --shadow:0 4px 20px rgba(0,0,0,.25);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{
+    font-family:"PingFang SC","Microsoft YaHei","Segoe UI",system-ui,sans-serif;
+    background:var(--bg); color:var(--text); font-size:14px; -webkit-font-smoothing:antialiased;
+  }
+  .app{display:flex; min-height:100vh}
+  /* Sidebar */
+  .sidebar{
+    width:230px; background:linear-gradient(180deg,#111827,#0b1220);
+    border-right:1px solid var(--line); display:flex; flex-direction:column; flex-shrink:0;
+    position:sticky; top:0; height:100vh; overflow-y:auto;
+  }
+  .brand{padding:20px 18px; border-bottom:1px solid var(--line)}
+  .brand h1{font-size:16px; margin:0; display:flex; align-items:center; gap:8px}
+  .brand .logo{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#2563eb,#06b6d4);
+    display:flex;align-items:center;justify-content:center;font-size:16px}
+  .brand p{margin:6px 0 0; font-size:11px; color:var(--muted)}
+  .nav{padding:10px 8px; flex:1}
+  .nav .group{font-size:11px;color:var(--muted);padding:12px 12px 6px;letter-spacing:1px}
+  .nav a{
+    display:flex; align-items:center; gap:10px; padding:9px 12px; margin:2px 0;
+    border-radius:8px; color:var(--muted); text-decoration:none; cursor:pointer; font-size:13.5px;
+    transition:.15s;
+  }
+  .nav a:hover{background:var(--panel2); color:var(--text)}
+  .nav a.active{background:var(--brand); color:#fff; font-weight:600}
+  .nav a .ic{width:18px;text-align:center}
+  .side-foot{padding:12px 16px;border-top:1px solid var(--line);font-size:11px;color:var(--muted)}
+  /* Main */
+  .main{flex:1; min-width:0; display:flex; flex-direction:column}
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between; gap:16px;
+    padding:16px 24px; border-bottom:1px solid var(--line); background:rgba(15,23,42,.7);
+    position:sticky; top:0; z-index:20; backdrop-filter:blur(6px);
+  }
+  .topbar h2{margin:0;font-size:18px}
+  .topbar .sub{font-size:12px;color:var(--muted);margin-top:3px}
+  .content{padding:22px 24px; max-width:1400px; width:100%}
+  /* Buttons */
+  .btn{
+    border:1px solid var(--line); background:var(--panel2); color:var(--text);
+    padding:8px 14px; border-radius:8px; cursor:pointer; font-size:13px; display:inline-flex;
+    align-items:center; gap:6px; transition:.15s;
+  }
+  .btn:hover{border-color:var(--brand2)}
+  .btn.primary{background:var(--brand); border-color:var(--brand); color:#fff; font-weight:600}
+  .btn.primary:hover{background:#1d4ed8}
+  .btn.danger{background:transparent;border-color:var(--danger);color:#fca5a5}
+  .btn.danger:hover{background:rgba(239,68,68,.12)}
+  .btn.sm{padding:5px 10px;font-size:12px}
+  /* KPI cards */
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:20px}
+  .kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;position:relative;overflow:hidden}
+  .kpi .label{font-size:12.5px;color:var(--muted)}
+  .kpi .val{font-size:28px;font-weight:700;margin-top:6px}
+  .kpi .val small{font-size:13px;color:var(--muted);font-weight:400}
+  .kpi .ic{position:absolute;right:14px;top:14px;font-size:22px;opacity:.35}
+  .kpi.ok{border-left:3px solid var(--ok)} .kpi.warn{border-left:3px solid var(--warn)}
+  .kpi.danger{border-left:3px solid var(--danger)} .kpi.info{border-left:3px solid var(--info)}
+  .kpi.brand{border-left:3px solid var(--brand2)}
+  /* Panels & grid */
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:1000px){.grid2{grid-template-columns:1fr}}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;margin-bottom:16px}
+  .panel h3{margin:0 0 14px;font-size:15px;display:flex;align-items:center;gap:8px}
+  .panel .hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+  .panel .hd h3{margin:0}
+  /* Tables */
+  .tablewrap{overflow-x:auto;border-radius:10px;border:1px solid var(--line)}
+  table{width:100%;border-collapse:collapse;font-size:13px;min-width:640px}
+  th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+  th{background:var(--panel2);color:var(--muted);font-weight:600;font-size:12px;position:sticky;top:0}
+  tbody tr:hover{background:rgba(37,99,235,.07)}
+  td .row-act{display:flex;gap:6px}
+  .empty{padding:40px;text-align:center;color:var(--muted)}
+  /* Badges */
+  .badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11.5px;font-weight:600;line-height:18px}
+  .badge.g{background:rgba(34,197,94,.15);color:#4ade80}
+  .badge.y{background:rgba(245,158,11,.15);color:#fbbf24}
+  .badge.r{background:rgba(239,68,68,.15);color:#f87171}
+  .badge.b{background:rgba(59,130,246,.15);color:#60a5fa}
+  .badge.c{background:rgba(6,182,212,.15);color:#22d3ee}
+  .badge.m{background:rgba(148,163,184,.18);color:#cbd5e1}
+  /* Toolbar */
+  .toolbar{display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
+  .toolbar .search{flex:1;min-width:180px;max-width:340px}
+  input,select,textarea{
+    background:var(--panel2);border:1px solid var(--line);color:var(--text);
+    padding:8px 11px;border-radius:8px;font-size:13px;width:100%;font-family:inherit;
+  }
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--brand2)}
+  select{cursor:pointer}
+  /* Modal */
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:flex-start;justify-content:center;z-index:100;padding:40px 16px;overflow-y:auto}
+  .overlay.show{display:flex}
+  .modal{background:var(--panel);border:1px solid var(--line);border-radius:14px;width:100%;max-width:640px;box-shadow:var(--shadow)}
+  .modal .mhd{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--line)}
+  .modal .mhd h3{margin:0;font-size:16px}
+  .modal .mbd{padding:20px}
+  .modal .close{cursor:pointer;font-size:22px;color:var(--muted);background:none;border:none}
+  .formgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:560px){.formgrid{grid-template-columns:1fr}}
+  .field{display:flex;flex-direction:column;gap:5px}
+  .field.full{grid-column:1/-1}
+  .field label{font-size:12px;color:var(--muted)}
+  .field label .req{color:var(--danger)}
+  .mft{display:flex;justify-content:flex-end;gap:10px;padding:14px 20px;border-top:1px solid var(--line)}
+  /* Progress bar */
+  .bar{height:8px;background:var(--panel2);border-radius:6px;overflow:hidden}
+  .bar > i{display:block;height:100%;border-radius:6px}
+  /* Alert list */
+  .alist{display:flex;flex-direction:column;gap:8px}
+  .alert-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:9px;background:var(--panel2);font-size:13px}
+  .alert-item .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+  .alert-item .txt{flex:1}
+  .alert-item .txt small{display:block;color:var(--muted);font-size:11.5px;margin-top:1px}
+  /* score meter */
+  .score-ring{display:flex;align-items:center;gap:14px}
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ok);color:#04250f;
+    padding:11px 20px;border-radius:10px;font-weight:600;z-index:200;box-shadow:var(--shadow);opacity:0;transition:.25s;pointer-events:none}
+  .toast.show{opacity:1}
+  .toast.err{background:var(--danger);color:#fff}
+  .hint{font-size:12px;color:var(--muted);margin:4px 0 14px}
+  .mobile-only{display:none}
+  @media(max-width:820px){
+    .sidebar{position:fixed;left:0;top:0;z-index:60;transform:translateX(-100%);transition:.25s}
+    .sidebar.open{transform:none}
+    .mobile-only{display:inline-flex}
+    .content{padding:16px}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <h1><span class="logo">🚛</span> 车队管理系统</h1>
+      <p>混凝土企业运输管理平台</p>
+    </div>
+    <nav class="nav" id="nav"></nav>
+    <div class="side-foot">
+      <div>数据存储：本地浏览器</div>
+      <div style="margin-top:6px">
+        <a onclick="exportData()" style="color:#60a5fa;cursor:pointer">导出</a> ·
+        <a onclick="importData()" style="color:#60a5fa;cursor:pointer">导入</a> ·
+        <a onclick="resetData()" style="color:#f87171;cursor:pointer">重置</a>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button class="btn sm mobile-only" onclick="toggleSidebar()">☰</button>
+        <div>
+          <h2 id="pageTitle">数据看板</h2>
+          <div class="sub" id="pageSub">车队运营概览</div>
+        </div>
+      </div>
+      <div id="topActions"></div>
+    </div>
+    <div class="content" id="content"></div>
+  </main>
+</div>
+
+<!-- Modal -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="mhd">
+      <h3 id="modalTitle">编辑</h3>
+      <button class="close" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="mbd"><div class="formgrid" id="formGrid"></div></div>
+    <div class="mft">
+      <button class="btn" onclick="closeModal()">取消</button>
+      <button class="btn primary" onclick="saveRecord()">保存</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<input type="file" id="importFile" accept=".json" style="display:none">
+
+<script>
+/* ============================================================
+   混凝土企业车队管理系统 —— 数据驱动的单页应用
+   模块：数据看板 / 车队管理 / 车队卫生 / 车队安全
+   数据持久化：localStorage（本地浏览器）
+   ============================================================ */
+
+const DB_KEY = 'concrete_fleet_db_v1';
+const VEHICLE_TYPES = ['搅拌车','混凝土泵车','自卸车','水泥罐车','装载机','铲车','工程车','其他'];
+const CONCRETE_GRADES = ['C15','C20','C25','C30','C35','C40','C45','C50','C60'];
+
+/* ---------- 表结构定义（Schema 驱动 CRUD） ---------- */
+const schemas = {
+  vehicles: {
+    title:'车辆台账', icon:'🚛', group:'车队管理',
+    sub:'车辆基础信息、证件与状态管理',
+    seq:'C', // 编号前缀
+    fields:[
+      {k:'plate', label:'车牌号', type:'text', req:true, w:110},
+      {k:'type', label:'车辆类型', type:'select', opts:VEHICLE_TYPES, req:true},
+      {k:'model', label:'品牌型号', type:'text'},
+      {k:'capacity', label:'方量/载重', type:'text', hint:'如 12m³ 或 30t'},
+      {k:'buyDate', label:'购置日期', type:'date'},
+      {k:'mileage', label:'当前里程(km)', type:'number'},
+      {k:'driver', label:'责任司机', type:'text'},
+      {k:'licenseExp', label:'行驶证到期', type:'date'},
+      {k:'insuranceExp', label:'保险到期', type:'date'},
+      {k:'inspectExp', label:'年检到期', type:'date'},
+      {k:'status', label:'状态', type:'select', opts:['在用','在途','维保中','停用'], req:true, badge:{'在用':'g','在途':'c','维保中':'y','停用':'m'}},
+      {k:'note', label:'备注', type:'textarea', full:true},
+    ],
+    columns:['plate','type','model','capacity','driver','mileage','status'],
+  },
+  drivers: {
+    title:'司机档案', icon:'👷', group:'车队管理',
+    sub:'驾驶员信息、证件与安全评分',
+    seq:'D',
+    fields:[
+      {k:'name', label:'姓名', type:'text', req:true},
+      {k:'phone', label:'联系电话', type:'text'},
+      {k:'idcard', label:'身份证号', type:'text'},
+      {k:'licenseType', label:'准驾车型', type:'select', opts:['A1','A2','A3','B1','B2','C1']},
+      {k:'licenseExp', label:'驾照到期', type:'date'},
+      {k:'qualExp', label:'从业资格证到期', type:'date'},
+      {k:'joinDate', label:'入职日期', type:'date'},
+      {k:'bindVehicle', label:'绑定车辆', type:'text'},
+      {k:'safeScore', label:'安全评分', type:'number', hint:'0-100', badgeScore:true},
+      {k:'status', label:'状态', type:'select', opts:['在职','休假','离职'], badge:{'在职':'g','休假':'y','离职':'m'}},
+    ],
+    columns:['name','phone','licenseType','bindVehicle','safeScore','status'],
+  },
+  dispatch: {
+    title:'运输任务/派车', icon:'📋', group:'车队管理',
+    sub:'混凝土运输任务派单与跟踪',
+    seq:'T',
+    fields:[
+      {k:'date', label:'任务日期', type:'date', req:true, default:'today'},
+      {k:'project', label:'工程项目', type:'text', req:true},
+      {k:'vehicle', label:'车辆', type:'text', req:true},
+      {k:'driver', label:'司机', type:'text'},
+      {k:'grade', label:'混凝土标号', type:'select', opts:CONCRETE_GRADES},
+      {k:'volume', label:'方量(m³)', type:'number'},
+      {k:'departTime', label:'出发时间', type:'time'},
+      {k:'arriveTime', label:'送达时间', type:'time'},
+      {k:'address', label:'送达地址', type:'text', full:true},
+      {k:'status', label:'状态', type:'select', opts:['待派车','运输中','已送达','已退单'], req:true, badge:{'待派车':'m','运输中':'c','已送达':'g','已退单':'r'}},
+    ],
+    columns:['date','project','vehicle','driver','grade','volume','status'],
+  },
+  maintenance: {
+    title:'维保保养', icon:'🔧', group:'车队管理',
+    sub:'车辆维修、保养与年检记录',
+    seq:'M',
+    fields:[
+      {k:'date', label:'日期', type:'date', req:true, default:'today'},
+      {k:'vehicle', label:'车辆', type:'text', req:true},
+      {k:'type', label:'类型', type:'select', opts:['常规保养','故障维修','轮胎更换','年检','事故维修'], req:true},
+      {k:'mileage', label:'当时里程(km)', type:'number'},
+      {k:'cost', label:'费用(元)', type:'number'},
+      {k:'nextDate', label:'下次保养日期', type:'date'},
+      {k:'garage', label:'维修单位', type:'text'},
+      {k:'detail', label:'维保内容', type:'textarea', full:true},
+    ],
+    columns:['date','vehicle','type','mileage','cost','nextDate'],
+  },
+  fuel: {
+    title:'里程油耗', icon:'⛽', group:'车队管理',
+    sub:'加油记录与百公里油耗统计',
+    seq:'F',
+    fields:[
+      {k:'date', label:'日期', type:'date', req:true, default:'today'},
+      {k:'vehicle', label:'车辆', type:'text', req:true},
+      {k:'mileage', label:'当前里程(km)', type:'number'},
+      {k:'runKm', label:'本次行驶(km)', type:'number'},
+      {k:'liters', label:'加油量(L)', type:'number'},
+      {k:'price', label:'单价(元/L)', type:'number'},
+      {k:'amount', label:'金额(元)', type:'number'},
+      {k:'note', label:'备注', type:'text', full:true},
+    ],
+    columns:['date','vehicle','runKm','liters','amount','_consume'],
+  },
+  cleaning: {
+    title:'清洗记录', icon:'🚿', group:'车队卫生',
+    sub:'罐体冲洗、车身清洗与驾驶室清洁',
+    seq:'CL',
+    fields:[
+      {k:'date', label:'日期', type:'date', req:true, default:'today'},
+      {k:'vehicle', label:'车辆', type:'text', req:true},
+      {k:'type', label:'清洗类型', type:'select', opts:['罐体冲洗','车身清洗','驾驶室清洁','轮胎除泥','综合保洁'], req:true},
+      {k:'worker', label:'清洗人', type:'text'},
+      {k:'residue', label:'残料清理', type:'select', opts:['已清理','无残料','未清理']},
+      {k:'score', label:'卫生评分', type:'number', hint:'0-100', badgeScore:true},
+      {k:'note', label:'备注', type:'textarea', full:true},
+    ],
+    columns:['date','vehicle','type','worker','residue','score'],
+  },
+  hygiene: {
+    title:'卫生检查', icon:'✨', group:'车队卫生',
+    sub:'定期卫生检查评分与问题整改',
+    seq:'HY',
+    fields:[
+      {k:'date', label:'检查日期', type:'date', req:true, default:'today'},
+      {k:'vehicle', label:'车辆', type:'text', req:true},
+      {k:'inspector', label:'检查人', type:'text'},
+      {k:'body', label:'车容车貌', type:'select', opts:['优','良','中','差']},
+      {k:'tank', label:'罐体清洁', type:'select', opts:['优','良','中','差']},
+      {k:'cab', label:'驾驶室卫生', type:'select', opts:['优','良','中','差']},
+      {k:'env', label:'防遗撒/环保', type:'select', opts:['合格','不合格']},
+      {k:'score', label:'综合评分', type:'number', hint:'0-100', badgeScore:true},
+      {k:'result', label:'检查结果', type:'select', opts:['合格','限期整改','不合格'], badge:{'合格':'g','限期整改':'y','不合格':'r'}},
+      {k:'problem', label:'问题描述', type:'textarea', full:true},
+    ],
+    columns:['date','vehicle','inspector','score','env','result'],
+  },
+  safetyCheck: {
+    title:'安全检查', icon:'🛡️', group:'车队安全',
+    sub:'车辆安全检查表（出车前/定期）',
+    seq:'SC',
+    fields:[
+      {k:'date', label:'检查日期', type:'date', req:true, default:'today'},
+      {k:'vehicle', label:'车辆', type:'text', req:true},
+      {k:'inspector', label:'检查人', type:'text'},
+      {k:'brake', label:'制动系统', type:'select', opts:['正常','异常']},
+      {k:'tire', label:'轮胎', type:'select', opts:['正常','异常']},
+      {k:'light', label:'灯光信号', type:'select', opts:['正常','异常']},
+      {k:'wiper', label:'雨刮/视野', type:'select', opts:['正常','异常']},
+      {k:'extinguisher', label:'灭火器', type:'select', opts:['正常','缺失/过期']},
+      {k:'gps', label:'GPS/行车记录', type:'select', opts:['正常','异常']},
+      {k:'result', label:'检查结论', type:'select', opts:['通过','带隐患出车','禁止出车'], req:true, badge:{'通过':'g','带隐患出车':'y','禁止出车':'r'}},
+      {k:'note', label:'备注', type:'textarea', full:true},
+    ],
+    columns:['date','vehicle','inspector','brake','tire','result'],
+  },
+  hazard: {
+    title:'隐患排查', icon:'⚠️', group:'车队安全',
+    sub:'安全隐患登记与整改闭环',
+    seq:'HZ',
+    fields:[
+      {k:'date', label:'发现日期', type:'date', req:true, default:'today'},
+      {k:'vehicle', label:'涉及车辆', type:'text'},
+      {k:'desc', label:'隐患描述', type:'textarea', req:true, full:true},
+      {k:'level', label:'隐患等级', type:'select', opts:['一般','较大','重大'], req:true, badge:{'一般':'b','较大':'y','重大':'r'}},
+      {k:'owner', label:'责任人', type:'text'},
+      {k:'deadline', label:'整改期限', type:'date'},
+      {k:'status', label:'整改状态', type:'select', opts:['待整改','整改中','已整改','已验收'], req:true, badge:{'待整改':'r','整改中':'y','已整改':'c','已验收':'g'}},
+      {k:'measure', label:'整改措施', type:'textarea', full:true},
+    ],
+    columns:['date','vehicle','level','owner','deadline','status'],
+  },
+  accident: {
+    title:'事故/违章', icon:'🚨', group:'车队安全',
+    sub:'交通事故与违章记录台账',
+    seq:'AC',
+    fields:[
+      {k:'date', label:'日期', type:'date', req:true, default:'today'},
+      {k:'vehicle', label:'车辆', type:'text', req:true},
+      {k:'driver', label:'司机', type:'text'},
+      {k:'type', label:'类型', type:'select', opts:['超速','闯红灯','违停','超载','轻微事故','一般事故','其他违章'], req:true},
+      {k:'points', label:'扣分', type:'number'},
+      {k:'fine', label:'罚款(元)', type:'number'},
+      {k:'liability', label:'责任认定', type:'select', opts:['全责','主责','同责','次责','无责','待定']},
+      {k:'status', label:'处理状态', type:'select', opts:['待处理','处理中','已结案'], badge:{'待处理':'r','处理中':'y','已结案':'g'}},
+      {k:'desc', label:'经过描述', type:'textarea', full:true},
+    ],
+    columns:['date','vehicle','driver','type','points','fine','status'],
+  },
+  training: {
+    title:'安全培训', icon:'📚', group:'车队安全',
+    sub:'司机安全教育与考核记录',
+    seq:'TR',
+    fields:[
+      {k:'date', label:'培训日期', type:'date', req:true, default:'today'},
+      {k:'topic', label:'培训主题', type:'text', req:true},
+      {k:'trainer', label:'讲师', type:'text'},
+      {k:'attendees', label:'参训人数', type:'number'},
+      {k:'names', label:'参训司机', type:'textarea', full:true},
+      {k:'avgScore', label:'平均考核成绩', type:'number', badgeScore:true},
+      {k:'result', label:'结果', type:'select', opts:['全员合格','部分补考','未完成'], badge:{'全员合格':'g','部分补考':'y','未完成':'r'}},
+    ],
+    columns:['date','topic','trainer','attendees','avgScore','result'],
+  },
+};
+
+const navConfig = [
+  {group:'', items:[{key:'dashboard', title:'数据看板', icon:'📊', sub:'车队运营概览'}]},
+  {group:'车队管理', items:['vehicles','drivers','dispatch','maintenance','fuel']},
+  {group:'车队卫生', items:['cleaning','hygiene']},
+  {group:'车队安全', items:['safetyCheck','hazard','accident','training']},
+];
+
+/* ---------- 数据层 ---------- */
+let DB = {};
+function loadDB(){
+  try{ DB = JSON.parse(localStorage.getItem(DB_KEY)) || {}; }catch(e){ DB={}; }
+  let changed=false;
+  for(const k in schemas){ if(!Array.isArray(DB[k])){ DB[k]=[]; changed=true; } }
+  if(!DB._seeded){ seed(); DB._seeded=true; changed=true; }
+  if(changed) saveDB();
+}
+function saveDB(){ localStorage.setItem(DB_KEY, JSON.stringify(DB)); }
+function genId(prefix){ return prefix+'-'+Date.now().toString(36).slice(-5)+Math.floor(Math.random()*90+10); }
+function today(){ return new Date().toISOString().slice(0,10); }
+function daysBetween(d){ if(!d) return null; return Math.ceil((new Date(d)-new Date(today()))/86400000); }
+
+/* ---------- 演示数据 ---------- */
+function seed(){
+  const plus=(n)=>{const d=new Date();d.setDate(d.getDate()+n);return d.toISOString().slice(0,10);};
+  DB.vehicles=[
+    {_id:genId('C'),plate:'京A·88012',type:'搅拌车',model:'三一 SY312C-8',capacity:'12m³',buyDate:'2021-05-10',mileage:186400,driver:'王建国',licenseExp:plus(200),insuranceExp:plus(15),inspectExp:plus(120),status:'在用',note:''},
+    {_id:genId('C'),plate:'京A·88025',type:'搅拌车',model:'中联 ZLJ5311',capacity:'12m³',buyDate:'2020-11-02',mileage:245100,driver:'李强',licenseExp:plus(60),insuranceExp:plus(-3),inspectExp:plus(8),status:'在途',note:'保险已过期，待续保'},
+    {_id:genId('C'),plate:'京A·90188',type:'混凝土泵车',model:'三一 SY5418',capacity:'56m臂架',buyDate:'2019-08-20',mileage:98230,driver:'赵勇',licenseExp:plus(300),insuranceExp:plus(90),inspectExp:plus(45),status:'维保中',note:'臂架液压保养中'},
+    {_id:genId('C'),plate:'京A·77234',type:'自卸车',model:'重汽 豪沃',capacity:'30t',buyDate:'2022-03-15',mileage:76500,driver:'孙磊',licenseExp:plus(500),insuranceExp:plus(150),inspectExp:plus(25),status:'在用',note:''},
+    {_id:genId('C'),plate:'京A·66120',type:'水泥罐车',model:'东风 天龙',capacity:'40m³',buyDate:'2020-06-30',mileage:312000,driver:'周涛',licenseExp:plus(-10),insuranceExp:plus(210),inspectExp:plus(180),status:'停用',note:'行驶证已过期，停运整备'},
+  ];
+  DB.drivers=[
+    {_id:genId('D'),name:'王建国',phone:'138****2201',licenseType:'A2',licenseExp:plus(400),qualExp:plus(120),joinDate:'2019-04-01',bindVehicle:'京A·88012',safeScore:96,status:'在职'},
+    {_id:genId('D'),name:'李强',phone:'139****5643',licenseType:'A2',licenseExp:plus(20),qualExp:plus(-5),joinDate:'2020-09-12',bindVehicle:'京A·88025',safeScore:78,status:'在职'},
+    {_id:genId('D'),name:'赵勇',phone:'137****8890',licenseType:'B2',licenseExp:plus(220),qualExp:plus(300),joinDate:'2018-11-20',bindVehicle:'京A·90188',safeScore:88,status:'在职'},
+    {_id:genId('D'),name:'孙磊',phone:'135****3312',licenseType:'A2',licenseExp:plus(150),qualExp:plus(90),joinDate:'2021-07-05',bindVehicle:'京A·77234',safeScore:82,status:'在职'},
+  ];
+  DB.dispatch=[
+    {_id:genId('T'),date:today(),project:'国贸三期基坑',vehicle:'京A·88012',driver:'王建国',grade:'C40',volume:12,departTime:'06:30',arriveTime:'07:10',address:'朝阳区建国路88号',status:'已送达'},
+    {_id:genId('T'),date:today(),project:'亦庄厂房地面',vehicle:'京A·88025',driver:'李强',grade:'C30',volume:12,departTime:'08:00',arriveTime:'',address:'经开区经海路',status:'运输中'},
+    {_id:genId('T'),date:today(),project:'地铁19号线',vehicle:'京A·77234',driver:'孙磊',grade:'C35',volume:10,departTime:'',arriveTime:'',address:'丰台区',status:'待派车'},
+  ];
+  DB.maintenance=[
+    {_id:genId('M'),date:plus(-5),vehicle:'京A·90188',type:'常规保养',mileage:97800,cost:3200,nextDate:plus(85),garage:'三一服务站',detail:'更换液压油、滤芯，臂架润滑'},
+    {_id:genId('M'),date:plus(-20),vehicle:'京A·88012',type:'轮胎更换',mileage:184000,cost:5600,nextDate:'',garage:'米其林服务中心',detail:'更换后桥4条轮胎'},
+  ];
+  DB.fuel=[
+    {_id:genId('F'),date:today(),vehicle:'京A·88012',mileage:186400,runKm:320,liters:98,price:7.65,amount:749.7,note:''},
+    {_id:genId('F'),date:plus(-1),vehicle:'京A·88025',mileage:244780,runKm:280,liters:92,price:7.65,amount:703.8,note:''},
+  ];
+  DB.cleaning=[
+    {_id:genId('CL'),date:today(),vehicle:'京A·88012',type:'罐体冲洗',worker:'保洁组',residue:'已清理',score:95,note:'收车后立即冲洗，无凝结残料'},
+    {_id:genId('CL'),date:plus(-1),vehicle:'京A·88025',type:'综合保洁',worker:'李强',residue:'已清理',score:85,note:''},
+  ];
+  DB.hygiene=[
+    {_id:genId('HY'),date:plus(-2),vehicle:'京A·88012',inspector:'安全员',body:'优',tank:'优',cab:'良',env:'合格',score:94,result:'合格',problem:''},
+    {_id:genId('HY'),date:plus(-2),vehicle:'京A·66120',inspector:'安全员',body:'中',tank:'差',cab:'中',env:'不合格',score:62,result:'限期整改',problem:'罐体残留干结混凝土，防遗撒篷布破损'},
+  ];
+  DB.safetyCheck=[
+    {_id:genId('SC'),date:today(),vehicle:'京A·88012',inspector:'王建国',brake:'正常',tire:'正常',light:'正常',wiper:'正常',extinguisher:'正常',gps:'正常',result:'通过',note:'出车前检查合格'},
+    {_id:genId('SC'),date:today(),vehicle:'京A·88025',inspector:'李强',brake:'正常',tire:'异常',light:'正常',wiper:'正常',extinguisher:'正常',gps:'正常',result:'带隐患出车',note:'左后轮胎压偏低，行驶中留意'},
+  ];
+  DB.hazard=[
+    {_id:genId('HZ'),date:plus(-3),vehicle:'京A·88025',desc:'左后轮胎磨损接近极限，胎压偏低',level:'较大',owner:'李强',deadline:plus(2),status:'整改中',measure:'安排更换轮胎'},
+    {_id:genId('HZ'),date:plus(-8),vehicle:'京A·66120',desc:'防遗撒篷布破损，存在洒漏风险',level:'一般',owner:'周涛',deadline:plus(-1),status:'待整改',measure:'更换篷布'},
+  ];
+  DB.accident=[
+    {_id:genId('AC'),date:plus(-15),vehicle:'京A·88025',driver:'李强',type:'超速',points:6,fine:200,liability:'全责',status:'已结案',desc:'京哈高速超速20%以下'},
+  ];
+  DB.training=[
+    {_id:genId('TR'),date:plus(-10),topic:'雨季行车安全与防侧翻',trainer:'安全科',attendees:12,names:'全体在职驾驶员',avgScore:91,result:'全员合格'},
+  ];
+}
+
+/* ---------- 渲染：导航 ---------- */
+let currentView='dashboard';
+function renderNav(){
+  const nav=document.getElementById('nav');
+  let html='';
+  navConfig.forEach(sec=>{
+    if(sec.group) html+=`<div class="group">${sec.group}</div>`;
+    sec.items.forEach(it=>{
+      if(typeof it==='string'){
+        const s=schemas[it];
+        html+=navLink(it, s.icon, s.title);
+      }else{
+        html+=navLink(it.key, it.icon, it.title);
+      }
+    });
+  });
+  nav.innerHTML=html;
+}
+function navLink(key,icon,title){
+  const cnt = schemas[key] ? `` : '';
+  return `<a class="${key===currentView?'active':''}" onclick="go('${key}')"><span class="ic">${icon}</span> ${title}</a>`;
+}
+
+function go(view){
+  currentView=view;
+  document.getElementById('sidebar').classList.remove('open');
+  renderNav();
+  if(view==='dashboard'){ renderDashboard(); }
+  else{ renderCollection(view); }
+  window.scrollTo(0,0);
+}
+
+/* ---------- 数据看板 ---------- */
+function renderDashboard(){
+  document.getElementById('pageTitle').textContent='数据看板';
+  document.getElementById('pageSub').textContent='车队运营概览 · '+today();
+  document.getElementById('topActions').innerHTML='';
+
+  const v=DB.vehicles;
+  const total=v.length;
+  const running=v.filter(x=>x.status==='在用'||x.status==='在途').length;
+  const maint=v.filter(x=>x.status==='维保中').length;
+  const stopped=v.filter(x=>x.status==='停用').length;
+  const todayTasks=DB.dispatch.filter(x=>x.date===today());
+  const todayVol=todayTasks.reduce((s,x)=>s+(+x.volume||0),0);
+  const openHazard=DB.hazard.filter(x=>x.status==='待整改'||x.status==='整改中').length;
+
+  // 证件/保养到期预警（30天内或已过期）
+  const alerts=[];
+  const pushExp=(name,label,d)=>{ const dd=daysBetween(d); if(dd!==null && dd<=30){ alerts.push({name,label,days:dd,d}); } };
+  v.forEach(x=>{
+    pushExp(x.plate,'行驶证',x.licenseExp);
+    pushExp(x.plate,'保险',x.insuranceExp);
+    pushExp(x.plate,'年检',x.inspectExp);
+  });
+  DB.drivers.forEach(x=>{ pushExp(x.name,'驾照',x.licenseExp); pushExp(x.name,'从业资格证',x.qualExp); });
+  DB.maintenance.forEach(x=>{ if(x.nextDate) pushExp(x.vehicle,'保养到期',x.nextDate); });
+  alerts.sort((a,b)=>a.days-b.days);
+
+  // 卫生 & 安全评分
+  const hyScores=DB.hygiene.map(x=>+x.score||0).filter(Boolean);
+  const hyAvg=hyScores.length?Math.round(hyScores.reduce((a,b)=>a+b,0)/hyScores.length):0;
+  const safeScores=DB.drivers.map(x=>+x.safeScore||0).filter(Boolean);
+  const safeAvg=safeScores.length?Math.round(safeScores.reduce((a,b)=>a+b,0)/safeScores.length):0;
+  const scoreColor=s=>s>=90?'var(--ok)':s>=75?'var(--warn)':'var(--danger)';
+
+  let html=`
+    <div class="kpis">
+      <div class="kpi brand"><div class="label">车辆总数</div><div class="val">${total}<small> 台</small></div><div class="ic">🚛</div></div>
+      <div class="kpi ok"><div class="label">运营中（在用/在途）</div><div class="val">${running}<small> 台</small></div><div class="ic">✅</div></div>
+      <div class="kpi warn"><div class="label">维保中 / 停用</div><div class="val">${maint}<small> / ${stopped}</small></div><div class="ic">🔧</div></div>
+      <div class="kpi info"><div class="label">今日运输任务</div><div class="val">${todayTasks.length}<small> 单 · ${todayVol}m³</small></div><div class="ic">📋</div></div>
+      <div class="kpi ${openHazard?'danger':'ok'}"><div class="label">待整改安全隐患</div><div class="val">${openHazard}<small> 项</small></div><div class="ic">⚠️</div></div>
+    </div>
+
+    <div class="grid2">
+      <div class="panel">
+        <div class="hd"><h3>⏰ 证件 / 保养到期预警</h3><span class="badge ${alerts.length?'y':'g'}">${alerts.length} 项</span></div>
+        <div class="hint">30天内到期或已过期的证件与保养提醒</div>
+        <div class="alist">
+          ${alerts.length? alerts.slice(0,12).map(a=>{
+            const overdue=a.days<0;
+            const color=overdue?'var(--danger)':a.days<=7?'var(--warn)':'var(--info)';
+            return `<div class="alert-item"><span class="dot" style="background:${color}"></span>
+              <div class="txt">${a.name} · ${a.label}
+                <small>${a.d} · ${overdue?`<span style="color:#f87171">已逾期 ${-a.days} 天</span>`:`剩 ${a.days} 天`}</small></div></div>`;
+          }).join('') : `<div class="empty">✅ 近期无到期预警</div>`}
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>📈 车队健康度</h3>
+        <div style="margin-bottom:18px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span>车辆完好率</span><b>${total?Math.round((total-stopped-maint)/total*100):0}%</b></div>
+          <div class="bar"><i style="width:${total?(total-stopped-maint)/total*100:0}%;background:var(--ok)"></i></div>
+        </div>
+        <div style="margin-bottom:18px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span>卫生检查平均分</span><b style="color:${scoreColor(hyAvg)}">${hyAvg}</b></div>
+          <div class="bar"><i style="width:${hyAvg}%;background:${scoreColor(hyAvg)}"></i></div>
+        </div>
+        <div style="margin-bottom:18px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span>司机安全平均分</span><b style="color:${scoreColor(safeAvg)}">${safeAvg}</b></div>
+          <div class="bar"><i style="width:${safeAvg}%;background:${scoreColor(safeAvg)}"></i></div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:20px">
+          <div style="flex:1;text-align:center;padding:12px;background:var(--panel2);border-radius:10px">
+            <div style="font-size:22px;font-weight:700">${DB.accident.filter(x=>x.status!=='已结案').length}</div>
+            <div style="font-size:12px;color:var(--muted)">未结案事故违章</div></div>
+          <div style="flex:1;text-align:center;padding:12px;background:var(--panel2);border-radius:10px">
+            <div style="font-size:22px;font-weight:700">${DB.safetyCheck.filter(x=>x.date===today()).length}</div>
+            <div style="font-size:12px;color:var(--muted)">今日安全检查</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="hd"><h3>📋 今日运输任务</h3><button class="btn primary sm" onclick="go('dispatch')">进入派车 →</button></div>
+      ${renderTable('dispatch', todayTasks, false)}
+    </div>
+
+    <div class="grid2">
+      <div class="panel">
+        <div class="hd"><h3>🚿 车辆分类统计</h3></div>
+        ${renderTypeStat()}
+      </div>
+      <div class="panel">
+        <div class="hd"><h3>⚠️ 待处理安全隐患</h3><button class="btn sm" onclick="go('hazard')">全部 →</button></div>
+        <div class="alist">
+          ${DB.hazard.filter(x=>x.status==='待整改'||x.status==='整改中').slice(0,6).map(x=>{
+            const dd=daysBetween(x.deadline);
+            const c=x.level==='重大'?'r':x.level==='较大'?'y':'b';
+            return `<div class="alert-item"><span class="badge ${c}">${x.level}</span>
+              <div class="txt">${x.desc.slice(0,28)}<small>${x.vehicle||'—'} · 责任人 ${x.owner||'—'} · ${dd!==null?(dd<0?`<span style="color:#f87171">逾期${-dd}天</span>`:`剩${dd}天`):'无期限'}</small></div></div>`;
+          }).join('')||`<div class="empty">✅ 暂无待处理隐患</div>`}
+        </div>
+      </div>
+    </div>
+  `;
+  document.getElementById('content').innerHTML=html;
+}
+
+function renderTypeStat(){
+  const counts={};
+  DB.vehicles.forEach(v=>counts[v.type]=(counts[v.type]||0)+1);
+  const max=Math.max(1,...Object.values(counts));
+  const entries=Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+  if(!entries.length) return `<div class="empty">暂无车辆</div>`;
+  return `<div class="alist">${entries.map(([t,n])=>`
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="width:90px;font-size:13px">${t}</div>
+      <div class="bar" style="flex:1"><i style="width:${n/max*100}%;background:var(--brand2)"></i></div>
+      <b style="width:30px;text-align:right">${n}</b>
+    </div>`).join('')}</div>`;
+}
+
+/* ---------- 通用集合视图（列表 + 增删改查） ---------- */
+let searchTerm='';
+function renderCollection(key){
+  const s=schemas[key];
+  searchTerm='';
+  document.getElementById('pageTitle').textContent=s.icon+' '+s.title;
+  document.getElementById('pageSub').textContent=s.sub;
+  document.getElementById('topActions').innerHTML=`<button class="btn primary" onclick="openModal('${key}')">＋ 新增${s.title}</button>`;
+  const rows=DB[key];
+  document.getElementById('content').innerHTML=`
+    <div class="panel">
+      <div class="toolbar">
+        <input class="search" id="searchInput" placeholder="🔍 搜索 ${s.title}..." oninput="onSearch('${key}')">
+        <span class="badge m" id="countBadge">共 ${rows.length} 条</span>
+      </div>
+      <div id="tableArea">${renderTable(key, rows, true)}</div>
+    </div>`;
+}
+function onSearch(key){
+  searchTerm=document.getElementById('searchInput').value.trim().toLowerCase();
+  const rows=filterRows(key);
+  document.getElementById('tableArea').innerHTML=renderTable(key, rows, true);
+  document.getElementById('countBadge').textContent='共 '+rows.length+' 条';
+}
+function filterRows(key){
+  const rows=DB[key];
+  if(!searchTerm) return rows;
+  return rows.filter(r=>Object.values(r).some(val=>String(val).toLowerCase().includes(searchTerm)));
+}
+
+function cellValue(key, field, row){
+  const f=schemas[key].fields.find(x=>x.k===field);
+  // 计算列：百公里油耗
+  if(field==='_consume'){
+    const km=+row.runKm||0, l=+row.liters||0;
+    return km>0? `<b>${(l/km*100).toFixed(1)}</b> L/100km` : '—';
+  }
+  let val=row[field];
+  if(val===undefined||val===null||val==='') return '<span style="color:#64748b">—</span>';
+  if(f&&f.badge&&f.badge[val]) return `<span class="badge ${f.badge[val]}">${val}</span>`;
+  if(f&&f.badgeScore){ const n=+val; const c=n>=90?'g':n>=75?'y':'r'; return `<span class="badge ${c}">${val}</span>`; }
+  // 日期到期高亮
+  if(f&&f.type==='date'&&/Exp$|Date$|deadline/.test(field) && !/buyDate|joinDate/.test(field)){
+    const dd=daysBetween(val);
+    if(dd!==null){
+      if(dd<0) return `${val} <span class="badge r">逾期</span>`;
+      if(dd<=30) return `${val} <span class="badge y">${dd}天</span>`;
+    }
+  }
+  return String(val);
+}
+
+function renderTable(key, rows, withActions){
+  const s=schemas[key];
+  const cols=s.columns;
+  const head=cols.map(c=>{
+    if(c==='_consume') return '<th>百公里油耗</th>';
+    const f=s.fields.find(x=>x.k===c);
+    return `<th>${f?f.label:c}</th>`;
+  }).join('')+(withActions?'<th style="width:110px">操作</th>':'');
+  if(!rows.length){
+    return `<div class="tablewrap"><table><thead><tr>${head}</tr></thead></table><div class="empty">📭 暂无数据${withActions?'，点击右上角"新增"添加':''}</div></div>`;
+  }
+  const body=rows.map(r=>{
+    const tds=cols.map(c=>`<td>${cellValue(key,c,r)}</td>`).join('');
+    const act=withActions?`<td><div class="row-act">
+      <button class="btn sm" onclick="openModal('${key}','${r._id}')">编辑</button>
+      <button class="btn sm danger" onclick="delRecord('${key}','${r._id}')">删</button>
+    </div></td>`:'';
+    return `<tr>${tds}${act}</tr>`;
+  }).join('');
+  return `<div class="tablewrap"><table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`;
+}
+
+/* ---------- 表单弹窗 ---------- */
+let editing={key:null,id:null};
+function openModal(key,id){
+  const s=schemas[key];
+  editing={key,id:id||null};
+  const row = id ? DB[key].find(x=>x._id===id) : {};
+  document.getElementById('modalTitle').textContent=(id?'编辑 ':'新增 ')+s.title;
+  const grid=document.getElementById('formGrid');
+  grid.innerHTML=s.fields.map(f=>{
+    let def = row[f.k];
+    if(def===undefined && f.default==='today') def=today();
+    def = def===undefined?'':def;
+    const req=f.req?'<span class="req"> *</span>':'';
+    const hint=f.hint?` <span style="color:#64748b">(${f.hint})</span>`:'';
+    let input;
+    if(f.type==='select'){
+      input=`<select data-k="${f.k}"><option value="">请选择</option>${f.opts.map(o=>`<option ${o===def?'selected':''}>${o}</option>`).join('')}</select>`;
+    }else if(f.type==='textarea'){
+      input=`<textarea data-k="${f.k}" rows="2">${escapeHtml(def)}</textarea>`;
+    }else{
+      input=`<input data-k="${f.k}" type="${f.type}" value="${escapeHtml(def)}">`;
+    }
+    return `<div class="field ${(f.full||f.type==='textarea')?'full':''}"><label>${f.label}${req}${hint}</label>${input}</div>`;
+  }).join('');
+  document.getElementById('overlay').classList.add('show');
+}
+function closeModal(){ document.getElementById('overlay').classList.remove('show'); }
+function saveRecord(){
+  const {key,id}=editing;
+  const s=schemas[key];
+  const inputs=document.querySelectorAll('#formGrid [data-k]');
+  const data={};
+  inputs.forEach(el=>data[el.dataset.k]=el.value.trim());
+  // 必填校验
+  for(const f of s.fields){ if(f.req && !data[f.k]){ toast('请填写：'+f.label, true); return; } }
+  if(id){
+    const idx=DB[key].findIndex(x=>x._id===id);
+    DB[key][idx]={...DB[key][idx],...data};
+    toast('已更新');
+  }else{
+    data._id=genId(s.seq||'R');
+    DB[key].unshift(data);
+    toast('已新增');
+  }
+  saveDB(); closeModal();
+  go(key);
+}
+function delRecord(key,id){
+  if(!confirm('确认删除该记录？此操作不可撤销。')) return;
+  DB[key]=DB[key].filter(x=>x._id!==id);
+  saveDB(); toast('已删除');
+  currentView==='dashboard'?renderDashboard():onSearchSafe(key);
+}
+function onSearchSafe(key){
+  const inp=document.getElementById('searchInput');
+  if(inp){ onSearch(key); } else { go(key); }
+}
+
+/* ---------- 工具 ---------- */
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function toast(msg,err){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast show'+(err?' err':'');
+  setTimeout(()=>t.className='toast'+(err?' err':''),1800);
+}
+function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); }
+
+/* ---------- 数据导入导出 ---------- */
+function exportData(){
+  const blob=new Blob([JSON.stringify(DB,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='车队数据_'+today()+'.json';
+  a.click();
+  toast('数据已导出');
+}
+function importData(){ document.getElementById('importFile').click(); }
+document.getElementById('importFile').addEventListener('change',e=>{
+  const file=e.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      const obj=JSON.parse(ev.target.result);
+      for(const k in schemas){ if(!Array.isArray(obj[k])) obj[k]=DB[k]||[]; }
+      DB=obj; DB._seeded=true; saveDB();
+      toast('数据导入成功'); go(currentView);
+    }catch(err){ toast('导入失败：文件格式错误',true); }
+  };
+  reader.readAsText(file);
+  e.target.value='';
+});
+function resetData(){
+  if(!confirm('确认清空所有数据并恢复演示数据？此操作不可撤销。')) return;
+  localStorage.removeItem(DB_KEY); loadDB(); toast('已重置'); go('dashboard');
+}
+
+/* ---------- 启动 ---------- */
+loadDB();
+renderNav();
+go('dashboard');
+</script>
+</body>
+</html>
