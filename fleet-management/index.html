@@ -312,6 +312,28 @@ const schemas = {
     ],
     columns:['date','vehicle','runKm','liters','amount','_consume'],
   },
+  outDriver: {
+    title:'外调司机费用', icon:'💰', group:'车队管理',
+    sub:'每日外调 / 外协司机派工与费用结算',
+    seq:'OD',
+    summary:true,
+    fields:[
+      {k:'date', label:'日期', type:'date', req:true, default:'today'},
+      {k:'name', label:'司机姓名', type:'text', req:true},
+      {k:'phone', label:'联系电话', type:'text'},
+      {k:'company', label:'外协单位/来源', type:'text', hint:'如个人/某车队'},
+      {k:'plate', label:'车牌号', type:'text'},
+      {k:'project', label:'工程项目', type:'text'},
+      {k:'billType', label:'计费方式', type:'select', opts:['按天','按趟','按方']},
+      {k:'trips', label:'趟数', type:'number'},
+      {k:'volume', label:'方量(m³)', type:'number'},
+      {k:'unitPrice', label:'单价(元)', type:'number', hint:'元/天·趟·方'},
+      {k:'amount', label:'费用金额(元)', type:'number', req:true},
+      {k:'settle', label:'结算状态', type:'select', opts:['待结算','已结算'], req:true, badge:{'待结算':'y','已结算':'g'}},
+      {k:'note', label:'备注', type:'textarea', full:true},
+    ],
+    columns:['date','name','company','project','billType','trips','amount','settle'],
+  },
   cleaning: {
     title:'清洗记录', icon:'🚿', group:'车队卫生',
     sub:'罐体冲洗、车身清洗与驾驶室清洁',
@@ -416,7 +438,7 @@ const schemas = {
 
 const navConfig = [
   {group:'', items:[{key:'dashboard', title:'数据看板', icon:'📊', sub:'车队运营概览'}]},
-  {group:'车队管理', items:['vehicles','drivers','dispatch','maintenance','fuel']},
+  {group:'车队管理', items:['vehicles','drivers','dispatch','maintenance','fuel','outDriver']},
   {group:'车队卫生', items:['cleaning','hygiene']},
   {group:'车队安全', items:['safetyCheck','hazard','accident','training']},
 ];
@@ -463,6 +485,11 @@ function seed(){
   DB.fuel=[
     {_id:genId('F'),date:today(),vehicle:'京A·88012',mileage:186400,runKm:320,liters:98,price:7.65,amount:749.7,note:''},
     {_id:genId('F'),date:plus(-1),vehicle:'京A·88025',mileage:244780,runKm:280,liters:92,price:7.65,amount:703.8,note:''},
+  ];
+  DB.outDriver=[
+    {_id:genId('OD'),date:today(),name:'陈师傅',phone:'136****7788',company:'个人外协',plate:'冀B·5521',project:'国贸三期基坑',billType:'按趟',trips:6,volume:72,unitPrice:120,amount:720,settle:'待结算',note:'旺季顶班'},
+    {_id:genId('OD'),date:today(),name:'刘师傅',phone:'150****2043',company:'鑫运车队',plate:'京G·3390',project:'亦庄厂房地面',billType:'按天',trips:5,volume:60,unitPrice:600,amount:600,settle:'待结算',note:''},
+    {_id:genId('OD'),date:plus(-1),name:'陈师傅',phone:'136****7788',company:'个人外协',plate:'冀B·5521',project:'地铁19号线',billType:'按方',trips:4,volume:48,unitPrice:18,amount:864,settle:'已结算',note:''},
   ];
   DB.cleaning=[
     {_id:genId('CL'),date:today(),vehicle:'京A·88012',type:'罐体冲洗',worker:'保洁组',residue:'已清理',score:95,note:'收车后立即冲洗，无凝结残料'},
@@ -534,6 +561,8 @@ function renderDashboard(){
   const todayTasks=DB.dispatch.filter(x=>x.date===today());
   const todayVol=todayTasks.reduce((s,x)=>s+(+x.volume||0),0);
   const openHazard=DB.hazard.filter(x=>x.status==='待整改'||x.status==='整改中').length;
+  const todayOut=DB.outDriver.filter(x=>x.date===today());
+  const todayOutSum=todayOut.reduce((s,x)=>s+(+x.amount||0),0);
 
   // 证件/保养到期预警（30天内或已过期）
   const alerts=[];
@@ -561,6 +590,7 @@ function renderDashboard(){
       <div class="kpi warn"><div class="label">维保中 / 停用</div><div class="val">${maint}<small> / ${stopped}</small></div><div class="ic">🔧</div></div>
       <div class="kpi info"><div class="label">今日运输任务</div><div class="val">${todayTasks.length}<small> 单 · ${todayVol}m³</small></div><div class="ic">📋</div></div>
       <div class="kpi ${openHazard?'danger':'ok'}"><div class="label">待整改安全隐患</div><div class="val">${openHazard}<small> 项</small></div><div class="ic">⚠️</div></div>
+      <div class="kpi info"><div class="label">今日外调司机费用</div><div class="val">¥${todayOutSum.toLocaleString()}<small> · ${todayOut.length}人次</small></div><div class="ic">💰</div></div>
     </div>
 
     <div class="grid2">
@@ -781,6 +811,7 @@ function renderCollection(key){
   document.getElementById('topActions').innerHTML=`<button class="btn primary" onclick="openModal('${key}')">＋ 新增${s.title}</button>`;
   const rows=DB[key];
   document.getElementById('content').innerHTML=`
+    ${renderCollectionSummary(key)}
     <div class="panel">
       <div class="toolbar">
         <input class="search" id="searchInput" placeholder="🔍 搜索 ${s.title}..." oninput="onSearch('${key}')">
@@ -788,6 +819,22 @@ function renderCollection(key){
       </div>
       <div id="tableArea">${renderTable(key, rows, true)}</div>
     </div>`;
+}
+function renderCollectionSummary(key){
+  if(key!=='outDriver') return '';
+  const rows=DB.outDriver;
+  const t=today(), month=t.slice(0,7);
+  const sum=arr=>arr.reduce((s,r)=>s+(+r.amount||0),0);
+  const todayRows=rows.filter(r=>r.date===t);
+  const todaySum=sum(todayRows);
+  const monthSum=sum(rows.filter(r=>(r.date||'').slice(0,7)===month));
+  const unpaid=sum(rows.filter(r=>r.settle==='待结算'));
+  return `<div class="kpis">
+    <div class="kpi brand"><div class="label">今日外调费用</div><div class="val">¥${todaySum.toLocaleString()}</div><div class="ic">💰</div></div>
+    <div class="kpi info"><div class="label">今日外调人次</div><div class="val">${todayRows.length}<small> 人次</small></div><div class="ic">👷</div></div>
+    <div class="kpi ok"><div class="label">本月累计费用</div><div class="val">¥${monthSum.toLocaleString()}</div><div class="ic">📅</div></div>
+    <div class="kpi ${unpaid?'warn':'ok'}"><div class="label">待结算金额</div><div class="val">¥${unpaid.toLocaleString()}</div><div class="ic">⏳</div></div>
+  </div>`;
 }
 function onSearch(key){
   searchTerm=document.getElementById('searchInput').value.trim().toLowerCase();
@@ -900,7 +947,10 @@ function delRecord(key,id){
   if(!confirm('确认删除该记录？此操作不可撤销。')) return;
   DB[key]=DB[key].filter(x=>x._id!==id);
   saveDB(); toast('已删除');
-  currentView==='dashboard'?renderDashboard():onSearchSafe(key);
+  if(currentView==='dashboard') renderDashboard();
+  else if(detailVehicleId && document.getElementById('tlArea')) openVehicle(detailVehicleId);
+  else if(schemas[key] && schemas[key].summary) go(key);
+  else onSearchSafe(key);
 }
 function onSearchSafe(key){
   const inp=document.getElementById('searchInput');
