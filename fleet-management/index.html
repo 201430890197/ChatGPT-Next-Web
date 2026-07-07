@@ -438,7 +438,7 @@ const schemas = {
 
 const navConfig = [
   {group:'', items:[{key:'dashboard', title:'数据看板', icon:'📊', sub:'车队运营概览'}]},
-  {group:'车队管理', items:['vehicles','drivers','dispatch','maintenance','fuel','outDriver']},
+  {group:'车队管理', items:['vehicles','drivers','dispatch','maintenance','fuel',{key:'consumption',icon:'📉',title:'油耗消耗分析'},'outDriver']},
   {group:'车队卫生', items:['cleaning','hygiene']},
   {group:'车队安全', items:['safetyCheck','hazard','accident','training']},
 ];
@@ -543,6 +543,7 @@ function go(view){
   document.getElementById('sidebar').classList.remove('open');
   renderNav();
   if(view==='dashboard'){ renderDashboard(); }
+  else if(view==='consumption'){ renderConsumption(); }
   else{ renderCollection(view); }
   window.scrollTo(0,0);
 }
@@ -708,6 +709,7 @@ function renderVehicleDetail(id){
   const openHaz=DB.hazard.filter(r=>r.vehicle===plate&&(r.status==='待整改'||r.status==='整改中')).length;
   const fuel30=DB.fuel.filter(r=>r.vehicle===plate&&r.date&&daysBetween(r.date)>=-30);
   const fuelCost30=fuel30.reduce((s,r)=>s+(+r.amount||0),0);
+  const cm=consumeStats(plate, today().slice(0,7)); // 本月消耗
   const statusBadge=(schemas.vehicles.fields.find(f=>f.k==='status').badge)[v.status]||'m';
 
   // 证件到期
@@ -739,6 +741,8 @@ function renderVehicleDetail(id){
         <h3 style="margin-top:18px">📄 证件到期</h3>
         <div class="infogrid">${certHtml}
           <div class="it"><div class="l">近30天油费</div><div class="v">¥${fuelCost30.toFixed(0)} <small style="color:var(--muted);font-weight:400">(${fuel30.length}次)</small></div></div>
+          <div class="it"><div class="l">本月里程</div><div class="v">${cm.km?cm.km.toLocaleString()+' km':'—'}</div></div>
+          <div class="it"><div class="l">本月油耗</div><div class="v">${cm.l100!==null?cm.l100.toFixed(1)+' L/100km':'—'}</div></div>
         </div>
         ${v.note?`<div class="hint" style="margin-top:14px">📝 备注：${escapeHtml(v.note)}</div>`:''}
       </div>
@@ -800,6 +804,92 @@ function quickAdd(key, vehicleId, plate){
   afterSaveVehicle=vehicleId;
   openModal(key, null, {vehicle:plate, date:today()});
 }
+
+/* ---------- 油耗消耗分析（按月统计每台车里程/加油/油耗） ---------- */
+let consumptionMonth=null;
+// 根据一组加油记录计算月里程（优先累加"本次行驶km"，否则用里程表最大-最小估算）
+function calcKm(recs){
+  let km=recs.reduce((s,r)=>s+(+r.runKm||0),0);
+  if(!km){ const ms=recs.map(r=>+r.mileage||0).filter(Boolean); if(ms.length>=2) km=Math.max(...ms)-Math.min(...ms); }
+  return km;
+}
+function consumeStats(plate, month){
+  const recs=DB.fuel.filter(r=>r.vehicle===plate && (r.date||'').slice(0,7)===month);
+  const km=calcKm(recs);
+  const liters=recs.reduce((s,r)=>s+(+r.liters||0),0);
+  const amount=recs.reduce((s,r)=>s+(+r.amount||0),0);
+  return {times:recs.length, km, liters, amount, l100: km>0?liters/km*100:null, perKm: km>0?amount/km:null};
+}
+function l100Badge(v){ return `<span class="badge ${v>45?'r':v>35?'y':'g'}">${Number(v).toFixed(1)}</span>`; }
+function nfmt(n,d=0){ return Number(n||0).toLocaleString(undefined,{maximumFractionDigits:d,minimumFractionDigits:d}); }
+
+function renderConsumption(){
+  detailVehicleId=null;
+  document.getElementById('pageTitle').textContent='📉 油耗消耗分析';
+  document.getElementById('pageSub').textContent='按月统计每台车的里程、加油量与油耗';
+  const months=[...new Set(DB.fuel.map(r=>(r.date||'').slice(0,7)).filter(Boolean))];
+  months.push(today().slice(0,7));
+  const opts=[...new Set(months)].sort().reverse();
+  if(!consumptionMonth||!opts.includes(consumptionMonth)) consumptionMonth=opts[0];
+  const month=consumptionMonth;
+  document.getElementById('topActions').innerHTML=
+    `<select style="width:auto" onchange="setConsumptionMonth(this.value)">`+
+    opts.map(m=>`<option value="${m}" ${m===month?'selected':''}>${m.replace('-','年')}月</option>`).join('')+`</select>`;
+
+  const plates=[...new Set(DB.vehicles.map(v=>v.plate).concat(DB.fuel.map(r=>r.vehicle)))].filter(Boolean);
+  const data=[];
+  plates.forEach(plate=>{
+    const st=consumeStats(plate, month);
+    if(!st.times) return;
+    const veh=DB.vehicles.find(v=>v.plate===plate);
+    data.push({plate, type:veh?veh.type:'外部车', ...st});
+  });
+  data.sort((a,b)=>b.liters-a.liters);
+
+  const tKm=data.reduce((s,r)=>s+r.km,0), tL=data.reduce((s,r)=>s+r.liters,0), tAmt=data.reduce((s,r)=>s+r.amount,0);
+  const avg=tKm>0? tL/tKm*100 : 0;
+  const dash='<span style="color:#64748b">—</span>';
+  const missKm='<span class="badge m">缺里程</span>';
+
+  let table;
+  if(!data.length){
+    table=`<div class="empty">📭 ${month} 暂无加油记录。<br>请到「里程油耗」登记加油（记得填「本次行驶km」），这里就会自动算出每台车的油耗。</div>`;
+  }else{
+    table=`<div class="tablewrap"><table><thead><tr>
+      <th>车辆</th><th>车型</th><th>加油次数</th><th>月里程(km)</th><th>加油量(L)</th><th>油费(¥)</th><th>百公里油耗(L)</th><th>每公里油费(¥)</th>
+    </tr></thead><tbody>${data.map(r=>`<tr>
+      <td><b>${r.plate}</b></td><td>${r.type}</td>
+      <td style="font-variant-numeric:tabular-nums">${r.times}</td>
+      <td style="font-variant-numeric:tabular-nums">${r.km?nfmt(r.km):dash}</td>
+      <td style="font-variant-numeric:tabular-nums">${nfmt(r.liters,1)}</td>
+      <td style="font-variant-numeric:tabular-nums">${nfmt(r.amount)}</td>
+      <td>${r.l100!==null?l100Badge(r.l100):missKm}</td>
+      <td style="font-variant-numeric:tabular-nums">${r.perKm!==null?nfmt(r.perKm,2):dash}</td>
+    </tr>`).join('')}
+    <tr style="font-weight:700;background:var(--panel2)">
+      <td colspan="3">合计 / 车队平均</td>
+      <td style="font-variant-numeric:tabular-nums">${nfmt(tKm)}</td>
+      <td style="font-variant-numeric:tabular-nums">${nfmt(tL,1)}</td>
+      <td style="font-variant-numeric:tabular-nums">${nfmt(tAmt)}</td>
+      <td>${tKm>0?l100Badge(avg):dash}</td>
+      <td style="font-variant-numeric:tabular-nums">${tKm>0?nfmt(tAmt/tKm,2):dash}</td>
+    </tr></tbody></table></div>`;
+  }
+
+  document.getElementById('content').innerHTML=`
+    <div class="kpis">
+      <div class="kpi brand"><div class="label">本月总里程</div><div class="val">${nfmt(tKm)}<small> km</small></div><div class="ic">🛣️</div></div>
+      <div class="kpi info"><div class="label">本月总加油</div><div class="val">${nfmt(tL)}<small> L</small></div><div class="ic">⛽</div></div>
+      <div class="kpi warn"><div class="label">本月总油费</div><div class="val">¥${nfmt(tAmt)}</div><div class="ic">💴</div></div>
+      <div class="kpi ok"><div class="label">车队平均油耗</div><div class="val">${nfmt(avg,1)}<small> L/100km</small></div><div class="ic">📉</div></div>
+    </div>
+    <div class="panel">
+      <div class="hd"><h3>📉 各车月度消耗（${month.replace('-','年')}月）</h3></div>
+      <div class="hint">月里程 = 各次「本次行驶km」之和（未填则用里程表最大−最小估算）；百公里油耗 = 加油量 ÷ 月里程 × 100；颜色：绿≤35 · 黄35-45 · 红>45。</div>
+      ${table}
+    </div>`;
+}
+function setConsumptionMonth(m){ consumptionMonth=m; renderConsumption(); }
 
 /* ---------- 通用集合视图（列表 + 增删改查） ---------- */
 let searchTerm='';
